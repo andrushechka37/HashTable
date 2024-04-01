@@ -5,7 +5,15 @@
       "type": "lldb",
       "request": "launch",
       "name": "andrews bebug",
-      "program": "${workspaceFolder}/sfml_example",
+      "program": "${workspaceFolder}/list_test",
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "СССССССССССС",
+      "program": "${workspaceFolder}/${fileBasenameNoExtension}",
       "args": [],
       "cwd": "${workspaceFolder}"
     },
