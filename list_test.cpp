@@ -14,8 +14,8 @@
 
 
 
-int hash_table_func(int number) {
-    return number % 10;
+int hash_table_func(char * word) {
+    return word[0] % 10;
 }
 
 void hash_table_ctor(hash_table * table) {
@@ -26,15 +26,15 @@ void hash_table_ctor(hash_table * table) {
 #define CUR_LIST_PTR (table->data)[place_for_number]
 #define TALE_IP CUR_LIST_PTR->data->prev
 
-void hash_table_insert(hash_table * table, int number) {
+void hash_table_insert(hash_table * table, char * word, int len_of_word) {
 
-    int place_for_number = hash_table_func(number);
+    int place_for_number = hash_table_func(word);
 
     if (CUR_LIST_PTR == NULL) {
         CUR_LIST_PTR = list_ctor();
     }
 
-    list_insert_after(CUR_LIST_PTR, TALE_IP, number);
+    list_insert_after(CUR_LIST_PTR, TALE_IP, word, len_of_word);
     return;
 }
 
@@ -61,11 +61,9 @@ int main(void) {
     hash_table table = {};
     hash_table_ctor(&table);
 
-    hash_table_insert(&table, 10);
-    hash_table_insert(&table, 11);
-    hash_table_insert(&table, 12);
-    hash_table_insert(&table, 13);
-    hash_table_insert(&table, 20);
+    hash_table_insert(&table, "dkhkj", strlen("dkhkj"));
+    hash_table_insert(&table, "ejfvj", strlen("ejfvj"));
+    hash_table_insert(&table, "fuck", strlen("fuck"));
 
     // for (int i = 0; i < 3; i++) {
     //     list_visualize(table.data[i], "-");

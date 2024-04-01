@@ -14,27 +14,22 @@ const int list_capacity = 13;
 const int free_elem_marker =  -1; 
 
 struct list_element {
-    int value; 
+    char * value; 
     int prev;
     int next;
+    int len_of_word;
 };
 
 struct doubly_linked_list {
     list_element * data;
     int free_element_head;
-    int size;
+    int len_of_list;
 };
 
 
 bool verify_list(doubly_linked_list * list);
 
-int list_insert_after(doubly_linked_list * list, int position, int value);
-
-int list_delete_elem(doubly_linked_list * list, int position);
-
-int list_swap(doubly_linked_list * list, int position1, int position2);
-
-void list_linearization(doubly_linked_list * list); 
+int list_insert_after(doubly_linked_list * list, int position, char * value, int given_len);
 
 
 
@@ -83,7 +78,7 @@ void list_visualize(doubly_linked_list * list, const char * comment) {
 
     for (int i = 0; i < list_capacity; i++) {
         fprintf(pfile, "\t%d [shape=Mrecord,style=filled, fillcolor=\"#7293ba\", label=\" ip: %d ", i, i);
-        fprintf(pfile, "| data: %d", list->data[i].value);
+        fprintf(pfile, "| data: %s", list->data[i].value);
         fprintf(pfile, "| next: %d", list->data[i].next);
         if (list->data[i].prev == free_elem_marker) {
             fprintf(pfile, "| prev: fre\" ");
@@ -213,7 +208,7 @@ bool verify_list(doubly_linked_list * list) {
 
 
 
-int list_insert_after(doubly_linked_list * list, int position, int value) {
+int list_insert_after(doubly_linked_list * list, int position, char * value, int given_len) {
 
     int cur = get_vacant_cell(list);
 
@@ -222,31 +217,20 @@ int list_insert_after(doubly_linked_list * list, int position, int value) {
     list->data[cur].prev = position; 
     list->data[cur].value = value;
     list->data[cur].next = list->data[position].next;
+    list->data[cur].len_of_word = given_len;
+
 
     list->data[position].next = cur;
 
     char comment[comment_len] = "";
-    snprintf(comment, comment_len,  "insert after %d position, inserted value is %d", position, value);
+    snprintf(comment, comment_len,  "insert after %d position, inserted value is %s", position, value);
     //list_visualize(list, comment);
-    list->size++;
+    list->len_of_list++;
     return 0;         // prev elem next is current
 
 }
 
-int list_delete_elem(doubly_linked_list * list, int position) {  // i was thinking of naming style like list_insert_after
-    // TODO: check if element is free - done in verificator      // list_delete_chosen sounds bad? or list_delete_current?
-                                                                 // but current bad i think.             
-    list->data[list->data[position].prev].next = list->data[position].next; // next of prev elem = next of cur elem
-    list->data[list->data[position].next].prev = list->data[position].prev; // prev of next elem = prev of cur elem
 
-    add_vacant_cell(list, position);
-    return 0;
-
-}
-
-int get_head(doubly_linked_list * list) {
-    return list->data[0].next;
-}
 
 doubly_linked_list * list_ctor(void) {
 
@@ -260,7 +244,7 @@ doubly_linked_list * list_ctor(void) {
     }
 
     list->free_element_head = 1;
-    list->size = 0;
+    list->len_of_list = 0;
     return list;
 }
 
@@ -330,7 +314,12 @@ void dump_list_txt(doubly_linked_list * list, FILE * pfile) {
 
     fprintf(pfile, "\ndata:|");
     for (int i = 0; i < list_capacity; i++) {
-        fprintf(pfile, " %.3d |", (list->data[i]).value);
+        if ((list->data[i]).value == 0) {
+
+            fprintf(pfile, " nul |");
+        } else {
+            fprintf(pfile, " %.20s |", (list->data[i]).value);
+        }
     }
 
     list_cell_close(pfile);
