@@ -273,42 +273,113 @@ static void add_vacant_cell(doubly_linked_list * list, int position) {
 
 
 
-void list_cell_open(FILE * pfile) {
-    fprintf(pfile, "\n     ");
-    for (int i = 0; i < list_capacity; i++) {
-        fprintf(pfile, "______");
+void list_cell_open(FILE * pfile, doubly_linked_list * list) {
+        fprintf(pfile, "\n     ");
+        for (int i = 0; i < list_capacity; i++) {
+
+        if ((list->data[i]).value != 0 && (list->data[i]).len_of_word >= 3) {
+
+            for (int j = 0; j < (list->data[i]).len_of_word + 3; j++) {
+                 fprintf(pfile, "_");
+            }
+
+        } else {
+            fprintf(pfile, "______");
+        }
     }
+    fprintf(pfile, "_");
+
     fprintf(pfile, "\n");
     return;
 }
 
-void list_cell_close(FILE * pfile) {
+void list_cell_close(FILE * pfile, doubly_linked_list * list) {
+
+
     fprintf(pfile, "\n     ");
 
-    for (int i = 0; i < list_capacity; i++) {
-        fprintf(pfile, "|     ");
+        for (int i = 0; i < list_capacity; i++) {
+
+        if ((list->data[i]).value != 0 && (list->data[i]).len_of_word >= 3) {
+
+            fprintf(pfile, "|");
+            for (int j = 0; j < (list->data[i]).len_of_word + 2; j++) {
+                fprintf(pfile, " ");
+            }
+
+        } else {
+            fprintf(pfile, "|     ");
+        }
     }
+
+
     fprintf(pfile, "|");
     fprintf(pfile, "\n     ");
-    for (int i = 0; i < list_capacity; i++) {
-        fprintf(pfile, "|     ");
+
+
+
+        for (int i = 0; i < list_capacity; i++) {
+
+        if ((list->data[i]).value != 0 && (list->data[i]).len_of_word >= 3) {
+
+            fprintf(pfile, "|");
+            for (int j = 0; j < (list->data[i]).len_of_word + 2; j++) {
+                fprintf(pfile, " ");
+            }
+
+        } else {
+            fprintf(pfile, "|     ");
+        }
     }
+
     fprintf(pfile, "|");
     fprintf(pfile, "\n     ");
-    for (int i = 0; i < list_capacity; i++) {
-        fprintf(pfile, "|_____");
-    }
+
+
+
+
+        for (int i = 0; i < list_capacity; i++) {
+
+        if ((list->data[i]).value != 0 && (list->data[i]).len_of_word >= 3) {
+
+            fprintf(pfile, "|");
+            for (int j = 0; j < (list->data[i]).len_of_word + 2; j++) {
+                fprintf(pfile, "_");
+            }
+
+        } else {
+            fprintf(pfile, "|_____");
+        }
+    }    
     fprintf(pfile, "|");
     return;
 }
 
 void dump_list_txt(doubly_linked_list * list, FILE * pfile) {
-    list_cell_open(pfile);
+
+
+
+    list_cell_open(pfile, list);
+
     fprintf(pfile, "  ip:| ");
     for (int i = 0; i < list_capacity; i++) {
-        fprintf(pfile, "%.3d | ", i);
+
+        if ((list->data[i]).value != 0 && (list->data[i]).len_of_word >= 3) {
+
+
+            fprintf(pfile, "%.3d", i);
+            for (int j = 0; j < (list->data[i]).len_of_word - 2; j++) {
+                 fprintf(pfile, " ");
+            }
+
+            fprintf(pfile, "| ");
+
+        } else {
+            fprintf(pfile, "%.3d | ", i);
+        }
     }
-    list_cell_close(pfile);
+
+    list_cell_close(pfile, list);
 
 
 
@@ -318,28 +389,23 @@ void dump_list_txt(doubly_linked_list * list, FILE * pfile) {
 
             fprintf(pfile, " nul |");
         } else {
-            fprintf(pfile, " %.20s |", (list->data[i]).value);
+
+            if ((list->data[i]).len_of_word < 3) {
+                fprintf(pfile, " %s", (list->data[i]).value);
+                for (int j = 0; j < (4 - (list->data[i]).len_of_word); j++) {
+                    fprintf(pfile, " ");
+                }
+                fprintf(pfile, "|");
+            } else {
+                fprintf(pfile, " %.20s |", (list->data[i]).value);
+
+            }
+            
         }
     }
 
-    list_cell_close(pfile);
+    list_cell_close(pfile, list);
 
-    fprintf(pfile, "\nnext:|");
-    for (int i = 0; i < list_capacity; i++) {
-        fprintf(pfile, " %.3d |", (list->data[i]).next);
-    }
-
-    list_cell_close(pfile);
-
-    fprintf(pfile, "\nprev:|");
-    for (int i = 0; i < list_capacity; i++) {
-        if((list->data[i]).prev == free_elem_marker) {
-            fprintf(pfile, " fre |");
-        } else {
-            fprintf(pfile, " %.3d |", (list->data[i]).prev);
-        }
-    }
-    list_cell_close(pfile);
 
 
     fprintf(pfile, "\n\nhead: [%.3d]\n", list->data[0].next);
@@ -347,3 +413,113 @@ void dump_list_txt(doubly_linked_list * list, FILE * pfile) {
     fprintf(pfile, "free: [%.3d]\n", list->free_element_head);
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// void list_cell_open(FILE * pfile) {
+//     fprintf(pfile, "\n     ");
+//     for (int i = 0; i < list_capacity; i++) {
+//         fprintf(pfile, "______");
+//     }
+//     fprintf(pfile, "\n");
+//     return;
+// }
+
+// void list_cell_close(FILE * pfile) {
+//     fprintf(pfile, "\n     ");
+
+//     for (int i = 0; i < list_capacity; i++) {
+//         fprintf(pfile, "|     ");
+//     }
+//     fprintf(pfile, "|");
+//     fprintf(pfile, "\n     ");
+//     for (int i = 0; i < list_capacity; i++) {
+//         fprintf(pfile, "|     ");
+//     }
+//     fprintf(pfile, "|");
+//     fprintf(pfile, "\n     ");
+//     for (int i = 0; i < list_capacity; i++) {
+//         fprintf(pfile, "|_____");
+//     }
+//     fprintf(pfile, "|");
+//     return;
+// }
+
+// void dump_list_txt(doubly_linked_list * list, FILE * pfile) {
+
+
+
+//     list_cell_open(pfile);
+//     fprintf(pfile, "  ip:| ");
+//     for (int i = 0; i < list_capacity; i++) {
+
+//         if ((list->data[i]).value != 0) {
+
+//             for (int j = 0; j < (list->data[j]).len_of_word - 2; j++) {
+//                  fprintf(pfile, " ");
+//             }
+
+//             fprintf(pfile, "| ");
+
+//         } else {
+//             fprintf(pfile, "%.3d | ", i);
+//         }
+//     }
+
+//     list_cell_close(pfile);
+
+
+
+//     fprintf(pfile, "\ndata:|");
+//     for (int i = 0; i < list_capacity; i++) {
+//         if ((list->data[i]).value == 0) {
+
+//             fprintf(pfile, " nul |");
+//         } else {
+//             fprintf(pfile, " %.20s |", (list->data[i]).value);
+//         }
+//     }
+
+//     list_cell_close(pfile);
+
+//     fprintf(pfile, "\nnext:|");
+//     for (int i = 0; i < list_capacity; i++) {
+//         fprintf(pfile, " %.3d |", (list->data[i]).next);
+//     }
+
+//     list_cell_close(pfile);
+
+//     fprintf(pfile, "\nprev:|");
+//     for (int i = 0; i < list_capacity; i++) {
+//         if((list->data[i]).prev == free_elem_marker) {
+//             fprintf(pfile, " fre |");
+//         } else {
+//             fprintf(pfile, " %.3d |", (list->data[i]).prev);
+//         }
+//     }
+//     list_cell_close(pfile);
+
+
+//     fprintf(pfile, "\n\nhead: [%.3d]\n", list->data[0].next);
+//     fprintf(pfile, "tale: [%.3d]\n", list->data[0].prev);
+//     fprintf(pfile, "free: [%.3d]\n", list->free_element_head);
+
+// }

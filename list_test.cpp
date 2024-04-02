@@ -7,7 +7,6 @@
 #include "hash_table.h"
 
 // обработка коллиции, сам поиск
-// добавить слова
 // парсем
 // читалка
 // поиск по ключу
@@ -64,6 +63,9 @@ int main(void) {
     hash_table_insert(&table, "dkhkj", strlen("dkhkj"));
     hash_table_insert(&table, "ejfvj", strlen("ejfvj"));
     hash_table_insert(&table, "fuck", strlen("fuck"));
+    hash_table_insert(&table, "dkhj", strlen("dkhj"));
+    hash_table_insert(&table, "d", strlen("d"));
+    hash_table_insert(&table, "da", strlen("da"));
 
     // for (int i = 0; i < 3; i++) {
     //     list_visualize(table.data[i], "-");
