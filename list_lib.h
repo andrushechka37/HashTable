@@ -9,7 +9,7 @@ if (verify_list(&list) != 0) {     \
 
 
 const int list_capacity = 13;
-                              
+const int max_len_of_word = 20;                      
 
 const int free_elem_marker =  -1; 
 
@@ -215,18 +215,17 @@ int list_insert_after(doubly_linked_list * list, int position, char * value, int
     list->data[list->data[position].next].prev = cur;      // prev of the next elem is current
 
     list->data[cur].prev = position; 
-    list->data[cur].value = value;
+    
+    list->data[cur].value = (char *) calloc (max_len_of_word, 1);
+    strcpy(list->data[cur].value, value);
+
     list->data[cur].next = list->data[position].next;
     list->data[cur].len_of_word = given_len;
 
-
     list->data[position].next = cur;
 
-    char comment[comment_len] = "";
-    snprintf(comment, comment_len,  "insert after %d position, inserted value is %s", position, value);
-    //list_visualize(list, comment);
     list->len_of_list++;
-    return 0;         // prev elem next is current
+    return 0;     
 
 }
 
@@ -261,6 +260,8 @@ int list_dtor(doubly_linked_list * list) {
 static int get_vacant_cell(doubly_linked_list * list) {
     int position = list->free_element_head;
     list->free_element_head = list->data[list->free_element_head].next; 
+
+    // if (free elem == size) -> realloc x2
     return position;
 }
 
@@ -411,6 +412,7 @@ void dump_list_txt(doubly_linked_list * list, FILE * pfile) {
     fprintf(pfile, "\n\nhead: [%.3d]\n", list->data[0].next);
     fprintf(pfile, "tale: [%.3d]\n", list->data[0].prev);
     fprintf(pfile, "free: [%.3d]\n", list->free_element_head);
+    fprintf(pfile, "len : [%.3d]\n", list->len_of_list);
 
 }
 
