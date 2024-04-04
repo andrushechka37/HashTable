@@ -2,13 +2,14 @@
 
 
 
+#include <cstdlib>
 #define verify(list)               \
 if (verify_list(&list) != 0) {     \
     return -1;                     \
 }
 
 
-const int list_capacity = 13;
+const int max_list_capacity = 5;
 const int max_len_of_word = 20;                      
 
 const int free_elem_marker =  -1; 
@@ -23,7 +24,8 @@ struct list_element {
 struct doubly_linked_list {
     list_element * data;
     int free_element_head;
-    int len_of_list;
+    int list_size;
+    int list_capacity;
 };
 
 
@@ -50,10 +52,11 @@ const int comment_len = 100;
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <math.h>
 
 
 void create_new_graph(void) {  // TODO: temporary files
+
     char command1[command_len] = "dot -Tpng /root/HASH/grath.dot  -o /root/HASH/graphs/graph";
     char command2[] = ".png";
     char graph_number_str[2] = {};
@@ -76,7 +79,7 @@ void list_visualize(doubly_linked_list * list, const char * comment) {
 
     fprintf(pfile, "\t50 [shape=note,style=filled, fillcolor=\"#fdf39b\", label=\"%s\", fontcolor = \"black\", fontsize = 20];\n", comment);
 
-    for (int i = 0; i < list_capacity; i++) {
+    for (int i = 0; i < list->list_capacity; i++) {
         fprintf(pfile, "\t%d [shape=Mrecord,style=filled, fillcolor=\"#7293ba\", label=\" ip: %d ", i, i);
         fprintf(pfile, "| data: %s", list->data[i].value);
         fprintf(pfile, "| next: %d", list->data[i].next);
@@ -93,13 +96,13 @@ void list_visualize(doubly_linked_list * list, const char * comment) {
     }
 
     fprintf(pfile, "\n\t");
-    for (int i = 0; i < list_capacity - 1; i++) {
+    for (int i = 0; i < list->list_capacity - 1; i++) {
         fprintf(pfile, "%d->", i);
     }
-    fprintf(pfile, "%d[weight = 100, color = \"invis\"];\n", list_capacity - 1);
+    fprintf(pfile, "%d[weight = 100, color = \"invis\"];\n", list->list_capacity - 1);
 
 
-    for(int i = 0; i < list_capacity - 1; i++) {
+    for(int i = 0; i < list->list_capacity - 1; i++) {
         if (list->data[i].prev == free_elem_marker) {     // draw next line
             fprintf(pfile, "\t%d->%d[color = \"#22f230\", constraint=false];\n", i, list->data[i].next);
         } else if (list->data[i].next == 0) {
@@ -110,7 +113,7 @@ void list_visualize(doubly_linked_list * list, const char * comment) {
     }
 
 
-    for (int i = 0; i < list_capacity; i++) {
+    for (int i = 0; i < list->list_capacity; i++) {
         if (list->data[i].prev != free_elem_marker && list->data[i].prev != list->data[0].prev) {   // draw prev line
             fprintf(pfile, "\t%d -> %d[color = \"#ff0a0a\", constraint=false];\n", i, list->data[i].prev);
         } else if (list->data[i].prev == list->data[0].prev) {
@@ -150,14 +153,6 @@ void html_dump(void) {
 }
 
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-
-
-
-
 static int  get_vacant_cell(doubly_linked_list * list);
 static void add_vacant_cell(doubly_linked_list * list, int position);
 
@@ -170,7 +165,7 @@ bool verify_list(doubly_linked_list * list) {
         return 1;     
     } 
 
-    for (int i = 0; i < list_capacity; i++) {
+    for (int i = 0; i < list->list_capacity; i++) {
         if (list->data[list->data[i].prev].next != i && list->data[i].prev != free_elem_marker) {
             printf("%d %d", list->data[list->data[i].prev].next, i);
             printf("next of previous elem is %d element is %d", list->data[list->data[i].prev].next, i);
@@ -188,7 +183,7 @@ bool verify_list(doubly_linked_list * list) {
         error = 1;       
     } 
 
-    if(list->free_element_head > list_capacity) { 
+    if(list->free_element_head > list->list_capacity) { 
         printf("free is out of range    %d    \n", list->free_element_head);
         error = 1;       
     } 
@@ -224,7 +219,7 @@ int list_insert_after(doubly_linked_list * list, int position, char * value, int
 
     list->data[position].next = cur;
 
-    list->len_of_list++;
+    list->list_size++;
     return 0;     
 
 }
@@ -236,19 +231,21 @@ doubly_linked_list * list_ctor(void) {
 
     doubly_linked_list * list = (doubly_linked_list *) calloc(sizeof(doubly_linked_list), 1);
 
-    list->data = (list_element *) calloc(list_capacity, sizeof(list_element));
-    for (int i = 1; i < list_capacity; i++) {
+    list->data = (list_element *) calloc(max_list_capacity, sizeof(list_element));
+
+    for (int i = 1; i < max_list_capacity; i++) {
         list->data[i].prev = free_elem_marker;
         list->data[i].next = i + 1;
     }
 
     list->free_element_head = 1;
-    list->len_of_list = 0;
+    list->list_size = 0;
+    list->list_capacity = max_list_capacity;
     return list;
 }
 
 int list_dtor(doubly_linked_list * list) {
-    for(int i = 0; i < list_capacity; i++) {
+    for(int i = 0; i < list->list_capacity; i++) {
         list->data[i].prev  = 0; 
         list->data[i].value = 0; 
         list->data[i].next  = 0; 
@@ -257,7 +254,25 @@ int list_dtor(doubly_linked_list * list) {
     return 0;
 }
 
+void list_realock_up(doubly_linked_list * list) {
+    list->data = (list_element *) realloc(list->data, sizeof(list_element) * list->list_capacity * 2);
+
+    for (int i = list->free_element_head; i < list->list_capacity * 2; i++) {
+        list->data[i].prev = free_elem_marker;
+        list->data[i].next = i + 1;
+    }
+
+    list->list_capacity *= 2;
+
+    return;
+}
+
 static int get_vacant_cell(doubly_linked_list * list) {
+
+    if (list->free_element_head == list->list_capacity - 1) {
+        list_realock_up(list);
+    }
+
     int position = list->free_element_head;
     list->free_element_head = list->data[list->free_element_head].next; 
 
@@ -276,7 +291,7 @@ static void add_vacant_cell(doubly_linked_list * list, int position) {
 
 void list_cell_open(FILE * pfile, doubly_linked_list * list) {
         fprintf(pfile, "\n     ");
-        for (int i = 0; i < list_capacity; i++) {
+        for (int i = 0; i < list->list_capacity; i++) {
 
         if ((list->data[i]).value != 0 && (list->data[i]).len_of_word >= 3) {
 
@@ -299,7 +314,7 @@ void list_cell_close(FILE * pfile, doubly_linked_list * list) {
 
     fprintf(pfile, "\n     ");
 
-        for (int i = 0; i < list_capacity; i++) {
+        for (int i = 0; i < list->list_capacity; i++) {
 
         if ((list->data[i]).value != 0 && (list->data[i]).len_of_word >= 3) {
 
@@ -319,7 +334,7 @@ void list_cell_close(FILE * pfile, doubly_linked_list * list) {
 
 
 
-        for (int i = 0; i < list_capacity; i++) {
+        for (int i = 0; i < list->list_capacity; i++) {
 
         if ((list->data[i]).value != 0 && (list->data[i]).len_of_word >= 3) {
 
@@ -339,7 +354,7 @@ void list_cell_close(FILE * pfile, doubly_linked_list * list) {
 
 
 
-        for (int i = 0; i < list_capacity; i++) {
+        for (int i = 0; i < list->list_capacity; i++) {
 
         if ((list->data[i]).value != 0 && (list->data[i]).len_of_word >= 3) {
 
@@ -363,7 +378,7 @@ void dump_list_txt(doubly_linked_list * list, FILE * pfile) {
     list_cell_open(pfile, list);
 
     fprintf(pfile, "  ip:| ");
-    for (int i = 0; i < list_capacity; i++) {
+    for (int i = 0; i < list->list_capacity; i++) {
 
         if ((list->data[i]).value != 0 && (list->data[i]).len_of_word >= 3) {
 
@@ -385,7 +400,7 @@ void dump_list_txt(doubly_linked_list * list, FILE * pfile) {
 
 
     fprintf(pfile, "\ndata:|");
-    for (int i = 0; i < list_capacity; i++) {
+    for (int i = 0; i < list->list_capacity; i++) {
         if ((list->data[i]).value == 0) {
 
             fprintf(pfile, " nul |");
@@ -411,117 +426,8 @@ void dump_list_txt(doubly_linked_list * list, FILE * pfile) {
 
     fprintf(pfile, "\n\nhead: [%.3d]\n", list->data[0].next);
     fprintf(pfile, "tale: [%.3d]\n", list->data[0].prev);
-    fprintf(pfile, "free: [%.3d]\n", list->free_element_head);
-    fprintf(pfile, "len : [%.3d]\n", list->len_of_list);
+    fprintf(pfile, "free: [%.3d]\n\n", list->free_element_head);
+    fprintf(pfile, "size: [%.3d]\n", list->list_size);
+    fprintf(pfile, "capa: [%.3d]\n", list->list_capacity);
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// void list_cell_open(FILE * pfile) {
-//     fprintf(pfile, "\n     ");
-//     for (int i = 0; i < list_capacity; i++) {
-//         fprintf(pfile, "______");
-//     }
-//     fprintf(pfile, "\n");
-//     return;
-// }
-
-// void list_cell_close(FILE * pfile) {
-//     fprintf(pfile, "\n     ");
-
-//     for (int i = 0; i < list_capacity; i++) {
-//         fprintf(pfile, "|     ");
-//     }
-//     fprintf(pfile, "|");
-//     fprintf(pfile, "\n     ");
-//     for (int i = 0; i < list_capacity; i++) {
-//         fprintf(pfile, "|     ");
-//     }
-//     fprintf(pfile, "|");
-//     fprintf(pfile, "\n     ");
-//     for (int i = 0; i < list_capacity; i++) {
-//         fprintf(pfile, "|_____");
-//     }
-//     fprintf(pfile, "|");
-//     return;
-// }
-
-// void dump_list_txt(doubly_linked_list * list, FILE * pfile) {
-
-
-
-//     list_cell_open(pfile);
-//     fprintf(pfile, "  ip:| ");
-//     for (int i = 0; i < list_capacity; i++) {
-
-//         if ((list->data[i]).value != 0) {
-
-//             for (int j = 0; j < (list->data[j]).len_of_word - 2; j++) {
-//                  fprintf(pfile, " ");
-//             }
-
-//             fprintf(pfile, "| ");
-
-//         } else {
-//             fprintf(pfile, "%.3d | ", i);
-//         }
-//     }
-
-//     list_cell_close(pfile);
-
-
-
-//     fprintf(pfile, "\ndata:|");
-//     for (int i = 0; i < list_capacity; i++) {
-//         if ((list->data[i]).value == 0) {
-
-//             fprintf(pfile, " nul |");
-//         } else {
-//             fprintf(pfile, " %.20s |", (list->data[i]).value);
-//         }
-//     }
-
-//     list_cell_close(pfile);
-
-//     fprintf(pfile, "\nnext:|");
-//     for (int i = 0; i < list_capacity; i++) {
-//         fprintf(pfile, " %.3d |", (list->data[i]).next);
-//     }
-
-//     list_cell_close(pfile);
-
-//     fprintf(pfile, "\nprev:|");
-//     for (int i = 0; i < list_capacity; i++) {
-//         if((list->data[i]).prev == free_elem_marker) {
-//             fprintf(pfile, " fre |");
-//         } else {
-//             fprintf(pfile, " %.3d |", (list->data[i]).prev);
-//         }
-//     }
-//     list_cell_close(pfile);
-
-
-//     fprintf(pfile, "\n\nhead: [%.3d]\n", list->data[0].next);
-//     fprintf(pfile, "tale: [%.3d]\n", list->data[0].prev);
-//     fprintf(pfile, "free: [%.3d]\n", list->free_element_head);
-
-// }

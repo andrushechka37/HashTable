@@ -12,10 +12,12 @@
 
 
 int hash_table_func(char * word) {
+
     return word[0] % 10;
 }
 
 void hash_table_ctor(hash_table * table) {
+
     (table->data) = (doubly_linked_list **) calloc(sizeof(doubly_linked_list *), hash_table_size);
     return;
 }
@@ -25,18 +27,18 @@ void hash_table_ctor(hash_table * table) {
 
 int get_position(doubly_linked_list * list, char * word) {
 
-    for (int i = 1; i <= list->len_of_list; i++) {
+    for (int i = 1; i <= list->list_size; i++) {
         if (strcmp(word, list->data[i].value) == 0) {
             return -1;
         }
     }
 
-    return list->len_of_list;
+    return list->list_size;
 }
 
 void hash_table_insert(hash_table * table, char * word, int len_of_word) {
 
-    int place_for_number = hash_table_func(word);
+    int place_for_number = hash_table_func(word); // dont like name
 
     if (CUR_LIST_PTR == NULL) {
         CUR_LIST_PTR = list_ctor();
@@ -71,7 +73,7 @@ void read_file_to_table(FILE * data, hash_table * table) {
 
     char word[max_len_of_word] = "";
     int len = 0;
-    //int i = fscanf(data, "%d %s",&len, word);
+
     while (fscanf(data, "%d %s",&len, word) == 2) {
         hash_table_insert(table, word, len);
     }
@@ -80,7 +82,7 @@ void read_file_to_table(FILE * data, hash_table * table) {
 int  hash_table_search(int hash, char * word, hash_table * table) {
     doubly_linked_list * list = table->data[hash];
 
-    for (int i = 1; i <= list->len_of_list; i++) {
+    for (int i = 1; i <= list->list_size; i++) {
         if (strcmp(word, list->data[i].value) == 0) {
             return i;
         }
