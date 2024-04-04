@@ -4,9 +4,10 @@
 const int hash_table_size = 2777;
 
 struct hash_table {
-    //pointer to hash func
+    int (*hash_table_func)(char * word, int len_of_word);
     doubly_linked_list ** data;
 };
+
 
 int always_zero_func(char * word, int len_of_word);
 int first_letter_func(char * word, int len_of_word);

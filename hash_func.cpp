@@ -1,7 +1,7 @@
 
 
 int always_zero_func(char * word, int len_of_word) {
-    return 0;
+    return 1;
 }
 
 int first_letter_func(char * word, int len_of_word) {

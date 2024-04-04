@@ -82,5 +82,8 @@
   "lldb.showDisassembly": "auto",
   "lldb.dereferencePointers": false,
   "lldb.consoleMode": "commands",
-  "lldb.displayFormat": "auto"
+  "lldb.displayFormat": "auto",
+  "editor.tokenColorCustomizations": {
+    "semanticHighlighting": false
+  }
 }
