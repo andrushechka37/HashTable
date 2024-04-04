@@ -14,3 +14,4 @@ int first_letter_func(char * word, int len_of_word);
 int word_len_func(char * word, int len_of_word);
 int ascii_sum_func(char * word, int len_of_word);
 int ascii_sum_div_len_func(char * word, int len_of_word);
+int ror_hash_func(char * word, int len_of_word);

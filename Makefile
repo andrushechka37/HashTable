@@ -16,7 +16,7 @@ CXXFLAGS =  -D _DEBUG -ggdb3 -std=c++17 -O0 -Wall -Wextra -Weffc++ -Waggressive-
 
 .PHONY: start
 start: list_test.o hash_func.o
-	clang++ list_test.o hash_func.o $(CXXFLAGS) -g -o list_test && ./list_test
+	clang++ list_test.o hash_func.o -g -o list_test && ./list_test
 
 list_test.o: hash_table.h list_test.cpp list_lib.h
 	clang++ -g -c list_test.cpp

@@ -236,7 +236,7 @@ doubly_linked_list * list_ctor(void) {
         list->data[i].prev = free_elem_marker;
         list->data[i].next = i + 1;
         list->data[i].len_of_word = 0;
-        list->data[i].value = "\0";
+        list->data[i].value = NULL;
     }
 
     list->free_element_head = 1;
