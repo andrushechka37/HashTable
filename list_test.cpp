@@ -9,6 +9,9 @@
 // sscanf and fread to читалка
 // int->size_t
 // calculate norm load factor
+// CRC32
+// dispersion
+// rol/ror godbolt
 
 int table_number_global = 1;
 
@@ -41,11 +44,13 @@ void hash_table_insert(hash_table * table, char * word, int len_of_word) {
 
     if (CUR_LIST_PTR == NULL) {
         CUR_LIST_PTR = list_ctor();
+        table->countity_of_lists++;
     }
 
     int position = get_position_in_list(CUR_LIST_PTR, word);
     if (position != -1) {
         list_insert_after(CUR_LIST_PTR, position, word, len_of_word);
+        table->sum_of_words++;
     }
 
     return;
@@ -158,6 +163,8 @@ int main(void) {
 
 
         //hash_table_dump_txt(&table);
+
+        printf("\nload factor of %d table is: %lf\n", i + 1, (float)table.sum_of_words/table.countity_of_lists);
 
         make_csv_table(&table);
         hash_table_dtor(&table);

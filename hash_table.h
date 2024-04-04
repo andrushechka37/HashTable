@@ -1,11 +1,13 @@
 #pragma once
 #include "list_lib.h"
 
-const int hash_table_size = 2777;
+const int hash_table_size = 2000;
 
 struct hash_table {
     int (*hash_table_func)(char * word, int len_of_word);
     doubly_linked_list ** data;
+    int countity_of_lists;
+    int sum_of_words;
 };
 
 

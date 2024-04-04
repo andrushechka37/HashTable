@@ -1,7 +1,7 @@
-const int hash_table_size = 2777;
+const int hash_table_size = 2000;
 
 int always_zero_func(char * word, int len_of_word) {
-    return 1;
+    return 50;
 }
 
 int first_letter_func(char * word, int len_of_word) {
