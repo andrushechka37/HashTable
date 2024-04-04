@@ -30,6 +30,7 @@ void parse_text(FILE * original, FILE * parsed_text) {
 
     while (fscanf(original, "%s %n", word, &len) == 1) {
         removePunctuation(word);
+        if (strlen(word) == 0) continue;
         fprintf(parsed_text, "%ld %s\n", strlen(word), word);
     }
 
@@ -42,4 +43,5 @@ int main() {
     FILE * original = fopen("text.txt", "r");
     FILE * parsed_text = fopen("data_storage.txt", "w");
     parse_text(original, parsed_text);
+    int i = 5;
 }

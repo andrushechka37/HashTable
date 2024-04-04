@@ -5,7 +5,7 @@
       "type": "lldb",
       "request": "launch",
       "name": "andrews bebug",
-      "program": "${workspaceFolder}/list_test",
+      "program": "${workspaceFolder}/get_data_storage",
       "args": [],
       "cwd": "${workspaceFolder}"
     },

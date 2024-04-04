@@ -34,7 +34,6 @@ bool verify_list(doubly_linked_list * list);
 int list_insert_after(doubly_linked_list * list, int position, char * value, int given_len);
 
 
-
 doubly_linked_list * list_ctor(void);
 int list_dtor(doubly_linked_list * list);
 
@@ -250,7 +249,11 @@ int list_dtor(doubly_linked_list * list) {
         list->data[i].value = 0; 
         list->data[i].next  = 0; 
     }
+    list->list_capacity = 0;
+    list->list_size = 0;
+    list->free_element_head = 0;
     free(list->data);
+    list->data = NULL;
     return 0;
 }
 
