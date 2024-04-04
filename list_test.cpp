@@ -105,12 +105,14 @@ void hash_table_dtor(hash_table * table) {
 void make_csv_table(hash_table * table) {
 
     char table_name[20] = "";
-    snprintf(table_name, 3,  "%d", table_number_global);
+    snprintf(table_name, 9,  "%d", table_number_global);
     table_number_global++;
-
     strcat(table_name, "table.csv");
+    char folder[30] = "tables/";
+    strcat(folder, table_name);
 
-    FILE * csv = fopen(table_name, "w");
+
+    FILE * csv = fopen(folder, "w");
     for (int i = 1; i < hash_table_size; i++) {
         if (table->data[i] == NULL) {
             fprintf(csv, "%d;0\n", i);
@@ -132,6 +134,7 @@ int main(void) {
 
     hash_table_dump_txt(&table);
 
+    make_csv_table(&table);
     make_csv_table(&table);
     hash_table_dtor(&table);
 }
