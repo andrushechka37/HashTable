@@ -1,7 +1,7 @@
 #pragma once
 #include "list_lib.h"
 
-const int hash_table_size = 2000;
+const int hash_table_size = 2003;
 
 struct hash_table {
     int (*hash_table_func)(char * word, int len_of_word);

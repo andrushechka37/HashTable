@@ -1,4 +1,4 @@
-const int hash_table_size = 2000;
+const int hash_table_size = 2003;
 
 int always_zero_func(char * word, int len_of_word) {
     return 50;

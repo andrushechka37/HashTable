@@ -82,5 +82,6 @@
   "lldb.showDisassembly": "auto",
   "lldb.dereferencePointers": false,
   "lldb.consoleMode": "commands",
-  "lldb.displayFormat": "auto"
+  "lldb.displayFormat": "auto",
+  "cSpell.enabled": true
 }

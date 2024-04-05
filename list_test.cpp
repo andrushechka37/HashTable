@@ -9,6 +9,7 @@
 // sscanf and fread to читалка
 // int->size_t
 // calculate norm load factor
+
 // CRC32
 // dispersion
 // rol/ror godbolt
