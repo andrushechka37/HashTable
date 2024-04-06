@@ -3,29 +3,23 @@
 #include <string.h>
 
 #include "hash_table.h"
-#include "list_lib.h"
-#include "hash_table.h"
+//#include "list_lib.h"
 
-// sscanf and fread to читалка
-// int->size_t
-// calculate norm load factor
 
 // CRC32
 // dispersion
-// rol/ror godbolt
+// remove from heder
+// wtf with inline
 
-int table_number_global = 1;
-
-
-
-void hash_table_ctor(hash_table * table) {
+void hash_table_ctor(hash_table * table,  size_t (*hash_table_func)(char * word, int len_of_word)) {
 
     (table->data) = (doubly_linked_list **) calloc(hash_table_size, sizeof(doubly_linked_list *));
+    table->hash_table_func = hash_table_func;
     return;
 }
 
 
-int get_position_in_list(doubly_linked_list * list, char * word) {
+int get_free_cell_in_list(doubly_linked_list * list, char * word) {
 
     for (int i = 1; i <= list->list_size; i++) {
         if (strcmp(word, list->data[i].value) == 0) {
@@ -45,10 +39,10 @@ void hash_table_insert(hash_table * table, char * word, int len_of_word) {
 
     if (CUR_LIST_PTR == NULL) {
         CUR_LIST_PTR = list_ctor();
-        table->countity_of_lists++;
+        table->quantity_of_lists++;
     }
 
-    int position = get_position_in_list(CUR_LIST_PTR, word);
+    int position = get_free_cell_in_list(CUR_LIST_PTR, word);
     if (position != -1) {
         list_insert_after(CUR_LIST_PTR, position, word, len_of_word);
         table->sum_of_words++;
@@ -62,7 +56,9 @@ void hash_table_insert(hash_table * table, char * word, int len_of_word) {
 #define CUR_LIST_PTR (table->data)[i]
 
 void hash_table_dump_txt(hash_table * table) {
-    FILE * log = fopen("log_file.txt", "w");
+
+    FILE * log = fopen("log_file.txt", "w");  // hardcode is ploho
+
     for (int i = 65; i < hash_table_size; i++) {
         if (CUR_LIST_PTR == NULL) continue;
 
@@ -73,6 +69,8 @@ void hash_table_dump_txt(hash_table * table) {
 
         printf("%d\n", i);
     }
+    
+    fclose(log);
     return;
 }
 
@@ -88,6 +86,7 @@ void read_file_to_table(FILE * data, hash_table * table) {
 }
 
 int  hash_table_search(int hash, char * word, hash_table * table) {
+
     doubly_linked_list * list = table->data[hash];
 
     for (int i = 1; i <= list->list_size; i++) {
@@ -100,6 +99,7 @@ int  hash_table_search(int hash, char * word, hash_table * table) {
 }
 
 void hash_table_dtor(hash_table * table) {
+
     for (int i = 0; i < hash_table_size; i++) {
         if (table->data[i] != NULL) {
             list_dtor(table->data[i]);
@@ -110,16 +110,15 @@ void hash_table_dtor(hash_table * table) {
     table->data = NULL;
 }
 
-
+int TABLE_NUMBER = 1;
 void make_csv_table(hash_table * table) {
 
     char table_name[20] = "";
-    snprintf(table_name, 9,  "%d", table_number_global);
-    table_number_global++;
+    snprintf(table_name, 9,  "%d", TABLE_NUMBER);
+    TABLE_NUMBER++;
     strcat(table_name, "table.csv");
     char folder[30] = "tables/";
     strcat(folder, table_name);
-
 
     FILE * csv = fopen(folder, "w");
 
@@ -138,34 +137,40 @@ void make_csv_table(hash_table * table) {
     fclose(csv);
 }
 
-const int countity_of_func = 6;
+const int quantity_of_func = 7;
 
 int main(void) {
 
-    int (*hash_table_func_array[countity_of_func])(char * word, int len_of_word) = {
+    size_t (*hash_table_func_array[quantity_of_func])(char * word, int len_of_word) = {
     always_zero_func,
     first_letter_func,
     word_len_func,
     ascii_sum_func,
     ascii_sum_div_len_func,
     ror_hash_func,
+    CRC32
     };
 
 
-    for (int i = 0; i < countity_of_func; i++) {
+    for (int i = 0; i < quantity_of_func; i++) {
 
         hash_table table = {};
-        hash_table_ctor(&table);
-        table.hash_table_func = hash_table_func_array[i];
+        hash_table_ctor(&table, hash_table_func_array[i]);
 
-        FILE * data = fopen("data_storage.txt", "r");
+        FILE * data = fopen("data_storage.txt", "r"); // hard code of file name is very very ploho
         read_file_to_table(data, &table);
         fclose(data);
 
+        printf("\nload factor of %d table is: %lf\n", i + 1, (float)table.sum_of_words/table.quantity_of_lists);
 
-        //hash_table_dump_txt(&table);
+        double disp = 0;
+        double average = (double)table.sum_of_words/table.quantity_of_lists;
 
-        printf("\nload factor of %d table is: %lf\n", i + 1, (float)table.sum_of_words/table.countity_of_lists);
+        for (int i = 0; i < hash_table_size; i++) {
+            if (table.data[i] == NULL) continue;
+            disp += (table.data[i]->list_size - average) * (table.data[i]->list_size - average);
+        }
+        printf("\ndisp %d table is: %lf\n", i + 1, disp/table.quantity_of_lists);
 
         make_csv_table(&table);
         hash_table_dtor(&table);

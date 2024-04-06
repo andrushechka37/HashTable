@@ -129,16 +129,32 @@ int ror_hash_func(char * word, int len_of_word) {
     return hash % hash_table_size;
 }
 ```
+o1
+my_ror(unsigned long):
+        mov     rax, rdi
+        ror     rax
+        ret
+my_rol(unsigned long):
+        mov     rax, rdi
+        rol     rax
+        ret
 
-my_ror(int):                             # @my_ror(int)
+o0
+
+my_ror(unsigned long):
         push    rbp
         mov     rbp, rsp
-        mov     dword ptr [rbp - 4], edi
-        mov     eax, dword ptr [rbp - 4]
-        shl     eax
-        mov     ecx, dword ptr [rbp - 4]
-        sar     ecx, 31
-        or      eax, ecx
+        mov     QWORD PTR [rbp-8], rdi
+        mov     rax, QWORD PTR [rbp-8]
+        ror     rax
+        pop     rbp
+        ret
+my_rol(unsigned long):
+        push    rbp
+        mov     rbp, rsp
+        mov     QWORD PTR [rbp-8], rdi
+        mov     rax, QWORD PTR [rbp-8]
+        rol     rax
         pop     rbp
         ret
 

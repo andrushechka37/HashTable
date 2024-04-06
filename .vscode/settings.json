@@ -83,5 +83,8 @@
   "lldb.dereferencePointers": false,
   "lldb.consoleMode": "commands",
   "lldb.displayFormat": "auto",
-  "cSpell.enabled": true
+  "cSpell.enabled": true,
+  "cSpell.words": [
+    "ploho"
+  ]
 }

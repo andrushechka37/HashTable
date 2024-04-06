@@ -1,19 +1,21 @@
 #pragma once
-#include "list_lib.h"
+#include "list_func.h"
+#include <cstddef>
 
 const int hash_table_size = 2003;
 
 struct hash_table {
-    int (*hash_table_func)(char * word, int len_of_word);
+    size_t (*hash_table_func)(char * word, int len_of_word);
     doubly_linked_list ** data;
-    int countity_of_lists;
-    int sum_of_words;
+    size_t quantity_of_lists;
+    size_t sum_of_words;
 };
 
 
-int always_zero_func(char * word, int len_of_word);
-int first_letter_func(char * word, int len_of_word);
-int word_len_func(char * word, int len_of_word);
-int ascii_sum_func(char * word, int len_of_word);
-int ascii_sum_div_len_func(char * word, int len_of_word);
-int ror_hash_func(char * word, int len_of_word);
+size_t always_zero_func(char * word, int len_of_word);
+size_t first_letter_func(char * word, int len_of_word);
+size_t word_len_func(char * word, int len_of_word);
+size_t ascii_sum_func(char * word, int len_of_word);
+size_t ascii_sum_div_len_func(char * word, int len_of_word);
+size_t ror_hash_func(char * word, int len_of_word);
+size_t CRC32(char * word, int len_of_word);
