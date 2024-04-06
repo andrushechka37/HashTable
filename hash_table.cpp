@@ -164,11 +164,14 @@ int main(void) {
         printf("\nload factor of %d table is: %lf\n", i + 1, (float)table.sum_of_words/table.quantity_of_lists);
 
         double disp = 0;
-        double average = (double)table.sum_of_words/table.quantity_of_lists;
+        double average = (double)table.sum_of_words/hash_table_size;
 
         for (int i = 0; i < hash_table_size; i++) {
-            if (table.data[i] == NULL) continue;
-            disp += (table.data[i]->list_size - average) * (table.data[i]->list_size - average);
+            if (table.data[i] == NULL) {
+                disp += average * average;
+            } else {
+                disp += (table.data[i]->list_size - average) * (table.data[i]->list_size - average);
+            }
         }
         printf("\ndisp %d table is: %lf\n", i + 1, disp/table.quantity_of_lists);
 

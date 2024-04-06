@@ -10,7 +10,7 @@ void removePunctuation(char *word) {
     char * new_verion = word;
     
     while(*old_version) {
-        if (ispunct((unsigned char)*old_version)) {
+        if (!isalpha((unsigned char)*old_version)) {
             old_version++;
         } else if (old_version == new_verion) {
             old_version++;

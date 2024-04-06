@@ -58,36 +58,36 @@
 <br/>
 <br/>
 
-## Функция, всегда возвращающая константу
+## 1. Функция, всегда возвращающая константу
 ```C
 const int random_const = 50;
 
-int always_const_func(char * word, int len_of_word) {
+size_t always_const_func(char * word, int len_of_word) {
     return random_const;
 }
 ```
 ![1](images/1_func.png)
 
-## Функция, возвращающая ASCII номер первой буквы слова
+## 2. Функция, возвращающая ASCII номер первой буквы слова
 ```C
-int first_letter_func(char * word, int len_of_word) {
+size_t first_letter_func(char * word, int len_of_word) {
     return word[0];
 }
 ```
 ![1](images/2_func.png)
 
 
-## Функция, возвращающая длину слова
+## 3. Функция, возвращающая длину слова
 ```C
-int word_len_func(char * word, int len_of_word) {
+size_t word_len_func(char * word, int len_of_word) {
     return len_of_word;
 }
 ```
 ![1](images/3_func.png)
-## Функция, считающая контрольную сумму (сумма всех ASCII кодов букв слова) для нескольких размеров таблицы
+## 4. Функция, считающая контрольную сумму (сумма всех ASCII кодов букв слова) для нескольких размеров таблицы
 ```C
-int ascii_sum_func(char * word, int len_of_word) {
-    int sum = 0;
+size_t ascii_sum_func(char * word, int len_of_word) {
+    size_t sum = 0;
     for (int i = 0; i < len_of_word; i++) {
         sum += word[i];
     }
@@ -101,7 +101,7 @@ int ascii_sum_func(char * word, int len_of_word) {
 
 ![77_funccc](images/77_funccc.png)
 
-## Функция, возвращающая контрольную сумму, деленную на длину слова
+## 5. Функция, возвращающая контрольную сумму, деленную на длину слова
 ```C
 int ascii_sum_div_len_func(char * word, int len_of_word) {
     int sum = 0;
@@ -115,7 +115,7 @@ int ascii_sum_div_len_func(char * word, int len_of_word) {
 ```
 
 ![1](images/5_func.png)
-## Ror xor функция
+## 6. Ror xor функция
 ```C
 int my_ror(int number) {
     return (number << 1) | (number >> 31);
@@ -128,8 +128,17 @@ int ror_hash_func(char * word, int len_of_word) {
     }
     return hash % hash_table_size;
 }
+
 ```
-o1
+## ror:
+![2](images/ror.png)
+## rol:
+![1](images/6_func.png)
+
+## Заметим что год болт
+
+O1:
+```assembly
 my_ror(unsigned long):
         mov     rax, rdi
         ror     rax
@@ -138,9 +147,9 @@ my_rol(unsigned long):
         mov     rax, rdi
         rol     rax
         ret
-
-o0
-
+```
+O0:
+```assembly
 my_ror(unsigned long):
         push    rbp
         mov     rbp, rsp
@@ -157,12 +166,13 @@ my_rol(unsigned long):
         rol     rax
         pop     rbp
         ret
+
+```
 
         
-![1](images/6_func.png)
 ## CRC32
+![df](images/ctc.png)
 
 
 
-
-#таблица load факторов и дисперсий
+# таблица дисперсий

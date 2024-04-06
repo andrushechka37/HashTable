@@ -1,6 +1,6 @@
 #include <cstddef>
 #include <cstdint>
-const int hash_table_size = 2003;
+#include "hash_table.h"
 
 size_t always_zero_func(char * word, int len_of_word) {
     return 50;
@@ -15,7 +15,7 @@ size_t word_len_func(char * word, int len_of_word) {
 }
 
 size_t ascii_sum_func(char * word, int len_of_word) {
-    int sum = 0;
+    size_t sum = 0;
     for (int i = 0; i < len_of_word; i++) {
         sum += word[i];
     }
@@ -23,7 +23,7 @@ size_t ascii_sum_func(char * word, int len_of_word) {
 }
 
 size_t ascii_sum_div_len_func(char * word, int len_of_word) {
-    int sum = 0;
+    size_t sum = 0;
     for (int i = 0; i < len_of_word; i++) {
         sum += word[i];
     }
@@ -42,7 +42,7 @@ inline int my_ror(size_t x) {
 }
 
 size_t ror_hash_func(char * word, int len_of_word) {
-    int hash = 0;
+    size_t hash = 0;
     for (int i = 0; i < len_of_word; i++) {
         hash = my_ror(hash) ^ word[i];
     }
@@ -50,7 +50,7 @@ size_t ror_hash_func(char * word, int len_of_word) {
 }
 
 size_t rol_hash_func(char * word, int len_of_word) {
-    int hash = 0;
+    size_t hash = 0;
     for (int i = 0; i < len_of_word; i++) {
         hash = my_rol(hash) ^ word[i];
     }
