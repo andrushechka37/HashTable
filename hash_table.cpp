@@ -3,12 +3,10 @@
 #include <string.h>
 
 #include "hash_table.h"
-//#include "list_lib.h"
 
 
-// CRC32
+
 // dispersion
-// remove from heder
 // wtf with inline
 
 void hash_table_ctor(hash_table * table,  size_t (*hash_table_func)(char * word, int len_of_word)) {
@@ -147,7 +145,7 @@ int main(void) {
     word_len_func,
     ascii_sum_func,
     ascii_sum_div_len_func,
-    ror_hash_func,
+    rol_hash_func,
     CRC32
     };
 

@@ -54,7 +54,7 @@ size_t rol_hash_func(char * word, int len_of_word) {
     for (int i = 0; i < len_of_word; i++) {
         hash = my_rol(hash) ^ word[i];
     }
-    return hash;
+    return hash % hash_table_size;
 }
 
 
