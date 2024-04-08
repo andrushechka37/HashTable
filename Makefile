@@ -16,7 +16,7 @@ CXXFLAGS =  -D _DEBUG -ggdb3 -std=c++17 -O0 -Wall -Wextra -Weffc++ -Waggressive-
 
 .PHONY: start
 start: hash_table.o hash_func.o list_func.o
-	clang++ hash_table.o hash_func.o list_func.o -g -o list_test && ./list_test
+	clang++ hash_table.o hash_func.o list_func.o -pg -g -o list_test && ./list_test
 
 hash_table.o: hash_table.h hash_table.cpp 
 	clang++ -g -c hash_table.cpp
@@ -25,5 +25,9 @@ hash_func.o: hash_func.cpp hash_table.h
 
 list_func.o: list_func.cpp list_func.h
 	clang++ -g -c list_func.cpp
+
+
+clean:
+	rm -rf *.o list_test get_data_storage tables/*.csv perf.data
 
 #$(CXXFLAGS)

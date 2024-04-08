@@ -197,5 +197,5 @@ my_rol(unsigned long):
 |      return len(word)      | 72                  |
 |      return ascii_sum      | 0.021               |
 | return ascii_sum/len(word) | 14                  |
-|        rol xor func        | 0,002               |
-|            CRC32           | 0,001               |
+|        rol xor func        | 0.002               |
+|            CRC32           | 0.001               |

@@ -4,8 +4,6 @@
 
 #include "hash_table.h"
 
-
-
 // dispersion
 // wtf with inline
 
@@ -180,3 +178,29 @@ int main(void) {
 
 
 
+
+//   43.89%  list_test  libc.so.6             [.] __strcmp_sse2_unaligned                                                                                                                                        ◆
+//   19.08%  list_test  list_test             [.] get_free_cell_in_list                                                                                                                                          ▒
+//   12.60%  list_test  libc.so.6             [.] __vfscanf_internal                                                                                                                                             ▒
+//    9.92%  list_test  list_test             [.] strcmp@plt                                                                                                                                                     ▒
+//    0.76%  list_test  [kernel.kallsyms]     [k] __add_to_page_cache_locked                                                                                                                                     ▒
+//    0.76%  list_test  [kernel.kallsyms]     [k] __softirqentry_text_start                                                                                                                                      ▒
+//    0.76%  list_test  [kernel.kallsyms]     [k] clear_page_erms                                                                                                                                                ▒
+//    0.76%  list_test  ld-linux-x86-64.so.2  [.] _dl_relocate_object                                                                                                                                            ▒
+//    0.76%  list_test  libc.so.6             [.] _IO_file_xsputn@@GLIBC_2.2.5                                                                                                                                   ▒
+//    0.76%  list_test  libc.so.6             [.] _IO_sputbackc                                                                                                                                                  ▒
+//    0.76%  list_test  libc.so.6             [.] __GI_____strtoll_l_internal                                                                                                                                    ▒
+//    0.76%  list_test  libc.so.6             [.] __isoc99_fscanf                                                                                                                                                ▒
+//    0.76%  list_test  libc.so.6             [.] __vfprintf_internal                                                                                                                                            ▒
+//    0.76%  list_test  list_test             [.] hash_table_insert                                                                                                                                              ▒
+//    0.38%  list_test  [kernel.kallsyms]     [k] __mod_node_page_state                                                                                                                                          ▒
+//    0.38%  list_test  [kernel.kallsyms]     [k] __x64_sys_openat                                                                                                                                               ▒
+//    0.38%  list_test  [kernel.kallsyms]     [k] apparmor_inode_getattr                                                                                                                                         ▒
+//    0.38%  list_test  [kernel.kallsyms]     [k] delete_from_page_cache_batch                                                                                                                                   ▒
+//    0.38%  list_test  [kernel.kallsyms]     [k] do_user_addr_fault                                                                                                                                             ▒
+//    0.38%  list_test  [kernel.kallsyms]     [k] iowrite16                                                                                                                                                      ▒
+//    0.38%  list_test  [kernel.kallsyms]     [k] rcu_core                                                                                                                                                       ▒
+//    0.38%  list_test  [kernel.kallsyms]     [k] rcu_do_batch                                                                                                                                                   ▒
+//    0.38%  list_test  [kernel.kallsyms]     [k] zap_pte_range                                                                                                                                                  ▒
+//    0.38%  list_test  ld-linux-x86-64.so.2  [.] mmap64                                                                                                                                                         ▒
+//    0.38%  list_test  libc.so.6             [.] __libc_calloc  
