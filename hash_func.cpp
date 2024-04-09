@@ -102,7 +102,7 @@ size_t CRC32(char * word, int len_of_word) {
 
     unsigned char* str = (unsigned char*)word;
 
-	while (len_of_word-- !=0) {
+	while (len_of_word-- != 0) {
         crc = crc_lookup_table[((uint8_t) crc ^ *(str++))] ^ (crc >> 8);
     }
     return ~crc % hash_table_size;

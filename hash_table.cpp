@@ -1,11 +1,12 @@
+#include <cstddef>
+#include <smmintrin.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "hash_table.h"
-
-// dispersion
-// wtf with inline
+#include <immintrin.h>
+#include <nmmintrin.h>
 
 void hash_table_ctor(hash_table * table,  size_t (*hash_table_func)(char * word, int len_of_word)) {
 
@@ -14,11 +15,32 @@ void hash_table_ctor(hash_table * table,  size_t (*hash_table_func)(char * word,
     return;
 }
 
+const int vector_capacity = 16;
 
-int get_free_cell_in_list(doubly_linked_list * list, char * word) {
+int fast_strcmp (const char * first, int len1, const char * second, int len2) {
+
+    if (len1 != len2) {
+        return 1;
+    }
+
+    __m128i first_word =  _mm_loadu_si128((const __m128i_u *)first);
+    __m128i second_word = _mm_loadu_si128((const __m128i_u *)second);
+
+    if (len1 > vector_capacity) {
+        return strcmp(first, second);
+    }
+
+    return _mm_cmpestri(first_word, len1, second_word, len2, _SIDD_UBYTE_OPS);
+
+}
+
+int get_free_cell_in_list(doubly_linked_list * list, char * word, int len_of_word) {
 
     for (int i = 1; i <= list->list_size; i++) {
-        if (strcmp(word, list->data[i].value) == 0) {
+        // if (strcmp(word, list->data[i].value) == 0) {
+        //     return -1;
+        // }
+        if (fast_strcmp(word, len_of_word, list->data[i].value, list->data[i].len_of_word) == 0) {
             return -1;
         }
     }
@@ -38,7 +60,7 @@ void hash_table_insert(hash_table * table, char * word, int len_of_word) {
         table->quantity_of_lists++;
     }
 
-    int position = get_free_cell_in_list(CUR_LIST_PTR, word);
+    int position = get_free_cell_in_list(CUR_LIST_PTR, word, len_of_word);
     if (position != -1) {
         list_insert_after(CUR_LIST_PTR, position, word, len_of_word);
         table->sum_of_words++;
@@ -71,7 +93,12 @@ void hash_table_dump_txt(hash_table * table) {
 }
 
 
-void read_file_to_table(FILE * data, hash_table * table) {
+void read_file_to_table(hash_table * table) {
+    FILE * data = fopen("data_storage.txt", "r"); // hard code of file name is very very ploho
+    if (data == NULL) {
+        printf("netu faila s dannumi\n");
+        return;
+    }
 
     char word[max_len_of_word] = "";
     int len = 0;
@@ -79,9 +106,14 @@ void read_file_to_table(FILE * data, hash_table * table) {
     while (fscanf(data, "%d %s",&len, word) == 2) {
         hash_table_insert(table, word, len);
     }
+    fclose(data);
 }
 
-int  hash_table_search(int hash, char * word, hash_table * table) {
+int  hash_table_search(char * word, hash_table * table) {
+
+    int len = strlen(word);
+
+    size_t hash = CRC32(word, len);
 
     doubly_linked_list * list = table->data[hash];
 
@@ -119,7 +151,7 @@ void make_csv_table(hash_table * table) {
     FILE * csv = fopen(folder, "w");
 
     if (csv == NULL) {
-        printf("NULL\n");
+        printf("NULL no tables folder\n");
         return;
     }
 
@@ -148,59 +180,65 @@ int main(void) {
     };
 
 
-    for (int i = 0; i < quantity_of_func; i++) {
+    // for (int i = 6; i < quantity_of_func; i++) {
 
         hash_table table = {};
-        hash_table_ctor(&table, hash_table_func_array[i]);
+        hash_table_ctor(&table, hash_table_func_array[6]);
 
-        FILE * data = fopen("data_storage.txt", "r"); // hard code of file name is very very ploho
-        read_file_to_table(data, &table);
-        fclose(data);
+        read_file_to_table(&table);
 
-        printf("\nload factor of %d table is: %lf\n", i + 1, (float)table.sum_of_words/table.quantity_of_lists);
+        unsigned long long res = 0;
+        int max_number = 100000;
 
-        double disp = 0;
-        double average = (double)table.sum_of_words/hash_table_size;
 
-        for (int i = 0; i < hash_table_size; i++) {
-            if (table.data[i] == NULL) {
-                disp += average * average;
-            } else {
-                disp += (table.data[i]->list_size - average) * (table.data[i]->list_size - average);
+        for (int n = 0; n < max_number; n++) {
+
+            unsigned long long start = __rdtsc();        
+
+            for (int i = 0; i < hash_table_size; i++) {
+
+                if (table.data[i] == NULL) continue;
+                for (int j = 1; j < table.data[i]->list_size; j++) {
+                    hash_table_search(table.data[i]->data[j].value, &table);
+                }
             }
-        }
-        printf("\ndisp %d table is: %lf\n", i + 1, disp/table.quantity_of_lists);
 
-        make_csv_table(&table);
+            unsigned long long end = __rdtsc();
+
+            res += (end-start);
+        }
+
+        //make_csv_table(&table);
+
+
+
         hash_table_dtor(&table);
-    }
+    // }
+
+
+    printf("\n\n%llu\n\n",res/max_number);
 }
 
 
 
 
-//   43.89%  list_test  libc.so.6             [.] __strcmp_sse2_unaligned                                                                                                                                        ◆
-//   19.08%  list_test  list_test             [.] get_free_cell_in_list                                                                                                                                          ▒
-//   12.60%  list_test  libc.so.6             [.] __vfscanf_internal                                                                                                                                             ▒
-//    9.92%  list_test  list_test             [.] strcmp@plt                                                                                                                                                     ▒
-//    0.76%  list_test  [kernel.kallsyms]     [k] __add_to_page_cache_locked                                                                                                                                     ▒
-//    0.76%  list_test  [kernel.kallsyms]     [k] __softirqentry_text_start                                                                                                                                      ▒
-//    0.76%  list_test  [kernel.kallsyms]     [k] clear_page_erms                                                                                                                                                ▒
-//    0.76%  list_test  ld-linux-x86-64.so.2  [.] _dl_relocate_object                                                                                                                                            ▒
-//    0.76%  list_test  libc.so.6             [.] _IO_file_xsputn@@GLIBC_2.2.5                                                                                                                                   ▒
-//    0.76%  list_test  libc.so.6             [.] _IO_sputbackc                                                                                                                                                  ▒
-//    0.76%  list_test  libc.so.6             [.] __GI_____strtoll_l_internal                                                                                                                                    ▒
-//    0.76%  list_test  libc.so.6             [.] __isoc99_fscanf                                                                                                                                                ▒
-//    0.76%  list_test  libc.so.6             [.] __vfprintf_internal                                                                                                                                            ▒
-//    0.76%  list_test  list_test             [.] hash_table_insert                                                                                                                                              ▒
-//    0.38%  list_test  [kernel.kallsyms]     [k] __mod_node_page_state                                                                                                                                          ▒
-//    0.38%  list_test  [kernel.kallsyms]     [k] __x64_sys_openat                                                                                                                                               ▒
-//    0.38%  list_test  [kernel.kallsyms]     [k] apparmor_inode_getattr                                                                                                                                         ▒
-//    0.38%  list_test  [kernel.kallsyms]     [k] delete_from_page_cache_batch                                                                                                                                   ▒
-//    0.38%  list_test  [kernel.kallsyms]     [k] do_user_addr_fault                                                                                                                                             ▒
-//    0.38%  list_test  [kernel.kallsyms]     [k] iowrite16                                                                                                                                                      ▒
-//    0.38%  list_test  [kernel.kallsyms]     [k] rcu_core                                                                                                                                                       ▒
-//    0.38%  list_test  [kernel.kallsyms]     [k] rcu_do_batch                                                                                                                                                   ▒
-//    0.38%  list_test  [kernel.kallsyms]     [k] zap_pte_range                                                                                                                                                  ▒
-//    0.38%  list_test  ld-linux-x86-64.so.2  [.] mmap64                                                                                                                                                         ▒
-//    0.38%  list_test  libc.so.6             [.] __libc_calloc  
+
+
+
+
+
+
+
+        // printf("\nload factor of %d table is: %lf\n", i + 1, (float)table.sum_of_words/table.quantity_of_lists);
+
+        // double disp = 0;
+        // double average = (double)table.sum_of_words/hash_table_size;
+
+        // for (int i = 0; i < hash_table_size; i++) {
+        //     if (table.data[i] == NULL) {
+        //         disp += average * average;
+        //     } else {
+        //         disp += (table.data[i]->list_size - average) * (table.data[i]->list_size - average);
+        //     }
+        // }
+        // printf("\ndisp %d table is: %lf\n", i + 1, disp/table.quantity_of_lists);
