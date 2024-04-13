@@ -224,7 +224,7 @@ int main(void) {
 
     // printf("\n\n%llu\n\n",res/max_number);
 
-    const char word1[] = "djdhfg";
+    const char word1[] = "g";
     printf("\nlen: %d\n", asm_strlen(word1));
     return 0;
     //asm_strcmp(word1, word2);
