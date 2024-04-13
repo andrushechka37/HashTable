@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <cstdio>
+
 #define verify(list)               \
 if (verify_list(&list) != 0) {     \
     return -1;                     \

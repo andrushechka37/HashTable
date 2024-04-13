@@ -10,8 +10,8 @@
 
 
 extern "C" int asm_strlen(const char * str);
-// read about asm insert
-// inline strang things 
+
+// inline strange things 
 
 void hash_table_ctor(hash_table * table,  size_t (*hash_table_func)(char * word, int len_of_word)) {
 
@@ -113,20 +113,17 @@ void read_file_to_table(hash_table * table) {
 
 int  hash_table_search(char * word, hash_table * table) {
 
-    int len = asm_strlen(word);
+    int len = strlen(word);
 
     size_t hash = table->hash_table_func(word, len);
 
     doubly_linked_list * list = table->data[hash];
 
     for (int i = 1; i <= list->list_size; i++) {
-        if (asm_strcmp(word, list->data[i].value) == 0) {
+
+        if (strcmp(word, list->data[i].value) == 0) {
             return i;
         }
-
-        // if (asm_strcmp(word, list->data[i].value) == 0) {
-        //     return i;
-        // }
     }
 
     return 0;
@@ -186,44 +183,34 @@ int main(void) {
     };
 
 
+    hash_table table = {};
+    hash_table_ctor(&table, hash_table_func_array[6]);
 
+    read_file_to_table(&table);
 
-        hash_table table = {};
-        hash_table_ctor(&table, hash_table_func_array[6]);
+    unsigned long long res = 0;
+    int max_number = 100000;
 
-        read_file_to_table(&table);
+    for (int n = 0; n < max_number; n++) {
 
-        unsigned long long res = 0;
-        int max_number = 100000;
+        unsigned long long start = __rdtsc();        
 
+        for (int i = 0; i < hash_table_size; i++) {
 
-        for (int n = 0; n < max_number; n++) {
-
-            unsigned long long start = __rdtsc();        
-
-            for (int i = 0; i < hash_table_size; i++) {
-
-                if (table.data[i] == NULL) continue;
-                for (int j = 1; j < table.data[i]->list_size; j++) {
-                    hash_table_search(table.data[i]->data[j].value, &table);
-                }
+            if (table.data[i] == NULL) continue;
+            for (int j = 1; j < table.data[i]->list_size; j++) {
+                hash_table_search(table.data[i]->data[j].value, &table);
             }
-
-            unsigned long long end = __rdtsc();
-
-            res += (end-start);
         }
 
-        make_csv_table(&table);
+        unsigned long long end = __rdtsc();
 
+        res += (end-start);
+    }
 
-
-        hash_table_dtor(&table);
-
+    make_csv_table(&table);
+    hash_table_dtor(&table);
     printf("\n\n%llu\n\n",res/max_number);
-
-
-    //asm_strcmp(word1, word2);
 }
 
 

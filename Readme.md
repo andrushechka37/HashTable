@@ -257,10 +257,18 @@ O0 after: 168428
 
 # strlen оптимизация
 
+
+```assembly
+asm_strlen:
+    xor     rax, rax          
+    vxorps  ymm2, ymm2, ymm2 
+
+    vmovdqu ymm0, [rdi]       
+    vpcmpeqb ymm1, ymm2, ymm0 
+    vpmovmskb eax, ymm1      
+    bsf     rax, rax          
+    ret                     
+```
+
 O0 after: 592823
 03 after: 587127
-
-
-## Если вы увидите грамматические ошибки, помните:
-> # Spell Checker для пидоров
-> ### *— [vvit19](https://github.com/vvit19), Речь на сдаче hash-таблицы*
