@@ -1,3 +1,4 @@
+#include <crc32intrin.h>
 #include <cstddef>
 #include <cstdint>
 #include "hash_table.h"
@@ -33,11 +34,11 @@ size_t ascii_sum_div_len_func(char * word, int len_of_word) {
 
 
 
-inline int my_rol(size_t x) {
+inline size_t my_rol(size_t x) {
     return (x << 1) | (x >> 63);
 }
-
-inline int my_ror(size_t x) {
+//!!!!!
+inline size_t my_ror(size_t x) {
     return (x >> 1) | (x << 63);
 }
 
@@ -102,8 +103,64 @@ size_t CRC32(char * word, int len_of_word) {
 
     unsigned char* str = (unsigned char*)word;
 
-	while (len_of_word-- != 0) {
-        crc = crc_lookup_table[((uint8_t) crc ^ *(str++))] ^ (crc >> 8);
+    while (len_of_word-- != 0) {
+        crc ^= *str++;
+        for (int bit = 0; bit < 8; bit++) {
+            if (crc & 1) {
+                crc = (crc >> 1) ^ 0xedb88320;
+            } else {
+                crc = crc >> 1;
+            }
+        }
     }
     return ~crc % hash_table_size;
 }
+
+size_t CRC32_modified(char * word, int len_of_word) {
+
+	size_t hash = 0;
+	uint32_t crc = 0x407EF1CA;
+
+	for (size_t i = 0; i < len_of_word; i++) {
+		hash = _mm_crc32_u8 (hash, word[i]);
+	}
+
+	return hash % hash_table_size;
+}
+
+#include <stddef.h>
+
+
+
+#include <immintrin.h>
+
+int asm_strcmp(const char *word1, const char *word2) {
+    int res = 0;
+
+    asm volatile (
+        "1:\n"
+        "movdqu (%1), %%xmm0\n"       // xmm0 = str1
+        "movdqu (%2), %%xmm1\n"       // xmm1 = str2
+        "pcmpeqb %%xmm1, %%xmm0\n"    // cmp(str1, str2)
+        "pmovmskb %%xmm0, %0\n"       // result = cmp(str1, str2)
+        "test %0, %0\n"               // if result = 0 ----> result = 0
+        "setnz %b0\n"                 // else          ----> result = 1
+        : "=r" (res)
+        : "r" (word1), "r" (word2)
+        : "xmm0", "xmm1", "cc"
+    );
+
+    if (res == 1) {
+        return 0;
+    } 
+    return res;
+}
+
+
+
+
+
+
+
+
+

@@ -126,7 +126,7 @@ int ascii_sum_div_len_func(char * word, int len_of_word) {
 ![1](images/5_func.png)
 ## 6. Rol xor функция
 ```C
-inline int my_rol(size_t x) {
+inline size_t my_rol(size_t x) {
     return (x << 1) | (x >> 63);
 }
 
@@ -139,12 +139,9 @@ size_t rol_hash_func(char * word, int len_of_word) {
 }
 
 ```
-## ror:
-![2](images/ror.png)
 ## rol:
 ![1](images/6_func.png)
 
-### Для ror происходит странное
 ### Видно, что распределение довольно-таки равномерное, значения в пиках не сильно отличаются от среднего
 
 ## Заметим что, при компилировании  с -O1 и выше, my_ror/my_rol заменяются компиллятором на ror и rol соответственно (код взят с сайта [godbolt](https://godbolt.org))
@@ -202,58 +199,56 @@ my_rol(unsigned long):
 
 
 
+pic of perf
+
+1 opt
+
+fast CRC32
+
+```
+size_t CRC32_modified(char * word, int len_of_word) {
+
+	size_t hash = 0;
+	uint32_t crc = 0x407EF1CA;
+
+	for (size_t i = 0; i < len_of_word; i++) {
+		hash = _mm_crc32_u8 (hash, word[i]);
+	}
+
+	return hash % hash_table_size;
+}
+```
+O0
+before:
+114820
+
+
+after:
+119219
+
+O3
+
+before:
+103493
+
+after:
+113869
+
+цифры потом
+
+2 Опт
 
 
 
 
-  48.41%  list_test  list_test             [.] CRC32
-  24.14%  list_test  list_test             [.] hash_table_search
-  15.62%  list_test  libc.so.6             [.] __strcmp_sse2_unaligned
-   6.90%  list_test  list_test             [.] main
-   2.73%  list_test  libc.so.6             [.] __strlen_sse2
-   1.31%  list_test  list_test             [.] 0x0000000000001220
-   0.84%  list_test  list_test             [.] 0x00000000000011b0
-   0.02%  list_test  libc.so.6             [.] __vfscanf_internal
-   0.00%  list_test  [kernel.kallsyms]     [k] __lock_text_start
-   0.00%  list_test  [kernel.kallsyms]     [k] __run_timers.part.0
-   0.00%  list_test  [kernel.kallsyms]     [k] finish_task_switch.isra.0
-   0.00%  list_test  [kernel.kallsyms]     [k] rmqueue
-   0.00%  list_test  [kernel.kallsyms]     [k] virtqueue_get_buf_ctx_split
-   0.00%  list_test  ld-linux-x86-64.so.2  [.] do_lookup_x
 
 
 strcmp->fast_strcmp
 
 
-123431 was for 100k operations
-
-120206 now
-
-```C
-int fast_strcmp (const char * first, int len1, const char * second, int len2) {
-
-    if (len1 != len2) {
-        return 1;
-    }
-
-    __m128i first_word =  _mm_loadu_si128((const __m128i_u *)first);
-    __m128i second_word = _mm_loadu_si128((const __m128i_u *)second);
-
-    if (len1 > vector_capacity) {
-        return strcmp(first, second);
-    }
-
-    return _mm_cmpestri(first_word, len1, second_word, len2, _SIDD_UBYTE_OPS);
-
-}
-```
- Ну что ж первая оптимизация всегда комом ожидаемо
 
 
 
 
 
-
-
-
-
+C vvit spellchecher для пидоров

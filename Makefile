@@ -15,17 +15,17 @@ CXXFLAGS =  -D _DEBUG -ggdb3 -std=c++17 -O0 -Wall -Wextra -Weffc++ -Waggressive-
 
 
 .PHONY: start
-start: hash_table.o hash_func.o list_func.o
-	g++ hash_table.o hash_func.o list_func.o -msse4.2 -g -o list_test && ./list_test
-
-hash_table.o: hash_table.h hash_table.cpp 
-	g++ -msse4.2 -g -c hash_table.cpp
+start: hash_table.o hash_func.o list_func.o strlen.o
+	clang++ hash_table.o hash_func.o list_func.o strlen.o -o list_test && ./list_test
+hash_table.o: hash_table.h hash_table.cpp strlen.s
+	clang++ -msse4.2  -g -v -c hash_table.cpp
 hash_func.o: hash_func.cpp hash_table.h
-	g++ -g -c hash_func.cpp
+	clang++ -mcrc32 -g -c hash_func.cpp
 
 list_func.o: list_func.cpp list_func.h
-	g++ -g -c list_func.cpp
-
+	clang++ -g -c list_func.cpp
+strlen.o: strlen.s 
+	nasm -f elf64 -g strlen.s 
 
 clean:
 	rm -rf *.o list_test get_data_storage tables/*.csv perf.data

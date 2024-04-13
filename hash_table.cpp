@@ -8,6 +8,11 @@
 #include <immintrin.h>
 #include <nmmintrin.h>
 
+
+extern "C" int asm_strlen(const char * str);
+// read about asm insert
+// inline strang things 
+
 void hash_table_ctor(hash_table * table,  size_t (*hash_table_func)(char * word, int len_of_word)) {
 
     (table->data) = (doubly_linked_list **) calloc(hash_table_size, sizeof(doubly_linked_list *));
@@ -37,10 +42,7 @@ int fast_strcmp (const char * first, int len1, const char * second, int len2) {
 int get_free_cell_in_list(doubly_linked_list * list, char * word, int len_of_word) {
 
     for (int i = 1; i <= list->list_size; i++) {
-        // if (strcmp(word, list->data[i].value) == 0) {
-        //     return -1;
-        // }
-        if (fast_strcmp(word, len_of_word, list->data[i].value, list->data[i].len_of_word) == 0) {
+        if (strcmp(word, list->data[i].value) == 0) {
             return -1;
         }
     }
@@ -113,7 +115,7 @@ int  hash_table_search(char * word, hash_table * table) {
 
     int len = strlen(word);
 
-    size_t hash = CRC32(word, len);
+    size_t hash = table->hash_table_func(word, len);
 
     doubly_linked_list * list = table->data[hash];
 
@@ -121,6 +123,10 @@ int  hash_table_search(char * word, hash_table * table) {
         if (strcmp(word, list->data[i].value) == 0) {
             return i;
         }
+
+        // if (asm_strcmp(word, list->data[i].value) == 0) {
+        //     return i;
+        // }
     }
 
     return 0;
@@ -176,47 +182,52 @@ int main(void) {
     ascii_sum_func,
     ascii_sum_div_len_func,
     rol_hash_func,
-    CRC32
+    CRC32_modified
     };
 
 
     // for (int i = 6; i < quantity_of_func; i++) {
 
-        hash_table table = {};
-        hash_table_ctor(&table, hash_table_func_array[6]);
+    //     hash_table table = {};
+    //     hash_table_ctor(&table, hash_table_func_array[6]);
 
-        read_file_to_table(&table);
+    //     read_file_to_table(&table);
 
-        unsigned long long res = 0;
-        int max_number = 100000;
-
-
-        for (int n = 0; n < max_number; n++) {
-
-            unsigned long long start = __rdtsc();        
-
-            for (int i = 0; i < hash_table_size; i++) {
-
-                if (table.data[i] == NULL) continue;
-                for (int j = 1; j < table.data[i]->list_size; j++) {
-                    hash_table_search(table.data[i]->data[j].value, &table);
-                }
-            }
-
-            unsigned long long end = __rdtsc();
-
-            res += (end-start);
-        }
-
-        //make_csv_table(&table);
+    //     unsigned long long res = 0;
+    //     int max_number = 100000;
 
 
+    //     for (int n = 0; n < max_number; n++) {
 
-        hash_table_dtor(&table);
-    // }
+    //         unsigned long long start = __rdtsc();        
+
+    //         for (int i = 0; i < hash_table_size; i++) {
+
+    //             if (table.data[i] == NULL) continue;
+    //             for (int j = 1; j < table.data[i]->list_size; j++) {
+    //                 hash_table_search(table.data[i]->data[j].value, &table);
+    //             }
+    //         }
+
+    //         unsigned long long end = __rdtsc();
+
+    //         res += (end-start);
+    //     }
+
+    //     make_csv_table(&table);
 
 
-    printf("\n\n%llu\n\n",res/max_number);
+
+    //     hash_table_dtor(&table);
+    // // }
+
+
+    // printf("\n\n%llu\n\n",res/max_number);
+
+    const char word1[] = "djdhfg";
+    printf("\nlen: %d\n", asm_strlen(word1));
+    return 0;
+    //asm_strcmp(word1, word2);
 }
 
 
