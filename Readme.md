@@ -198,13 +198,13 @@ my_rol(unsigned long):
 |            CRC32           | 0.001               |
 
 
+-------------------------------------------------------------------------------
+# 2 Часть: оптимизация
+## С помощью профилировщика perf были выявлены функции, с самым большим временем исполнения.
+![2](/images/perf1.png)
 
-pic of perf
-
-1 opt
-
-fast CRC32
-
+# Оптимизация CRC32
+## Функция CRC32 была ускорена путем использования intrinsic функций, а именно `_mm_crc32_u8`
 ```
 size_t CRC32_modified(char * word, int len_of_word) {
 
@@ -218,37 +218,49 @@ size_t CRC32_modified(char * word, int len_of_word) {
 	return hash % hash_table_size;
 }
 ```
-O0
-before:
-114820
+1111111111111111111111111111
+O0 before: 1231868
+O3 before: 1232153
+O0 after: 83680
+03 after: 80608
+
+# Оптимизация strcmp при помощи встроенного ассемблера
+
+```C
+int asm_strcmp(const char *word1, const char *word2) {
+    int res = 0;
+
+    asm volatile (
+        "1:\n"
+        "movdqu (%1), %%xmm0\n"       // xmm0 = str1
+        "movdqu (%2), %%xmm1\n"       // xmm1 = str2
+        "pcmpeqb %%xmm1, %%xmm0\n"    // cmp(1, 2)
+        "pmovmskb %%xmm0, %0\n"       // res = cmp(1, 2)
+        "test %0, %0\n"               
+        "setnz %b0\n"                 
+        : "=r" (res)
+        : "r" (word1), "r" (word2)
+        : "xmm0", "xmm1", "cc"
+    );
+
+    if (res == 1) {
+        return 0;
+    } 
+    return res;
+}
+```
+
+O0 after: 168428
+03 after: 167569
 
 
-after:
-119219
 
-O3
+# strlen оптимизация
 
-before:
-103493
-
-after:
-113869
-
-цифры потом
-
-2 Опт
+O0 after: 592823
+03 after: 587127
 
 
-
-
-
-
-strcmp->fast_strcmp
-
-
-
-
-
-
-
-C vvit spellchecher для пидоров
+## Если вы увидите грамматические ошибки, помните:
+> # Spell Checker для пидоров
+> ### *— [vvit19](https://github.com/vvit19), Речь на сдаче hash-таблицы*
