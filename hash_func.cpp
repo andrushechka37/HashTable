@@ -47,7 +47,7 @@ size_t ror_hash_func(char * word, int len_of_word) {
     for (int i = 0; i < len_of_word; i++) {
         hash = my_ror(hash) ^ word[i];
     }
-    return hash % hash_table_size;
+    return hash % hash_table_size; // TODO: hash table should do this... (or add assert and docs to hash function)
 }
 
 size_t rol_hash_func(char * word, int len_of_word) {
@@ -117,4 +117,4 @@ int asm_strcmp(const char *word1, const char *word2) {
 
 
 
-
+// TODO: gotta love newlines

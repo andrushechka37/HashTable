@@ -8,6 +8,7 @@ const int max_len_of_word = 20;
 void removePunctuation(char *word) {
     char * old_version = word;
     char * new_verion = word;
+    //    ^ TODO: haven't decided yet char* a or char *a and choose the worst
     
     while(*old_version) {
         if (!isalpha((unsigned char)*old_version)) {
@@ -43,5 +44,6 @@ int main() {
     FILE * original = fopen("text.txt", "r");
     FILE * parsed_text = fopen("data_storage.txt", "w");
     parse_text(original, parsed_text);
-    int i = 5;
+    int i = 5; // TODO: what why
+    // __asm__("int 0x3"); // also raise(SIGTRAP); // also __builtin_debugtrap(); if you want a debug break
 }

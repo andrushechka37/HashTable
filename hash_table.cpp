@@ -77,7 +77,8 @@ void hash_table_insert(hash_table * table, char * word, int len_of_word) {
 
 void hash_table_dump_txt(hash_table * table) {
 
-    FILE * log = fopen("log_file.txt", "w");  // hardcode is ploho
+    // TODO: make a logging library out of this
+    FILE * log = fopen("log_file.txt", "w");  // hardcode is ploho TODO: yes (also check this)
 
     for (int i = 65; i < hash_table_size; i++) {
         if (CUR_LIST_PTR == NULL) continue;
@@ -96,9 +97,9 @@ void hash_table_dump_txt(hash_table * table) {
 
 
 void read_file_to_table(hash_table * table) {
-    FILE * data = fopen("data_storage.txt", "r"); // hard code of file name is very very ploho
+    FILE * data = fopen("data_storage.txt", "r"); // hard code of file name is very very ploho TODO: if you say it's bad it doesn't make it better (maybe a bit)!
     if (data == NULL) {
-        printf("netu faila s dannumi\n");
+        printf("netu faila s dannumi\n"); // TODO: file not found: "useful-information-for-debuggin-this.txt", also why did fopen fail? Look in errno! (perror)
         return;
     }
 
@@ -111,9 +112,9 @@ void read_file_to_table(hash_table * table) {
     fclose(data);
 }
 
-int  hash_table_search(char * word, hash_table * table) {
+int hash_table_search(char * word, hash_table * table) {
 
-    int len = strlen(word);
+    int len = strlen(word); // TODO: Isn't this slow?
 
     size_t hash = table->hash_table_func(word, len);
 
@@ -141,7 +142,7 @@ void hash_table_dtor(hash_table * table) {
     table->data = NULL;
 }
 
-int TABLE_NUMBER = 1;
+int TABLE_NUMBER = 1; // TODO: at least static?
 void make_csv_table(hash_table * table) {
 
     char table_name[20] = "";
@@ -172,8 +173,10 @@ const int quantity_of_func = 7;
 
 int main(void) {
 
+    // TODO: typedef for hash function type
+    //       so it looks like hash_table_hash_function functions[] = {};
     size_t (*hash_table_func_array[quantity_of_func])(char * word, int len_of_word) = {
-    always_zero_func,
+    always_zero_func, // TODO: style, align
     first_letter_func,
     word_len_func,
     ascii_sum_func,
@@ -191,11 +194,12 @@ int main(void) {
     unsigned long long res = 0;
     int max_number = 100000;
 
+    // NOTE: you can add few initial runs to load caches
     for (int n = 0; n < max_number; n++) {
 
         unsigned long long start = __rdtsc();        
 
-        for (int i = 0; i < hash_table_size; i++) {
+        for (int i = 0; i < hash_table_size; i++) { // NOTE: Can you try to not lookup every element
 
             if (table.data[i] == NULL) continue;
             for (int j = 1; j < table.data[i]->list_size; j++) {
@@ -203,7 +207,7 @@ int main(void) {
             }
         }
 
-        unsigned long long end = __rdtsc();
+        unsigned long long end = __rdtsc(); // NOTE: Can you calculate nanoseconds from clock (check out procps source code, it probably has a solution, also htop)
 
         res += (end-start);
     }
