@@ -12,20 +12,21 @@ CXXFLAGS =  -D _DEBUG -ggdb3 -std=c++17 -O0 -Wall -Wextra -Weffc++ -Waggressive-
    -fstack-protector -fstrict-overflow -fno-omit-frame-pointer -Wlarger-than=8192                  \
    -Wstack-usage=8192 -fsanitize=address -fsanitize=undefined -fPIE -Werror=vla
 
+ASAN = -O3 -mavx
 
 .PHONY: start
 
 start: hash_table.o hash_func.o list_func.o strlen.o
-	clang++ hash_table.o hash_func.o list_func.o strlen.o -O0 -o list_test && ./list_test
+	clang++ hash_table.o hash_func.o list_func.o strlen.o $(ASAN) -o list_test && ./list_test
 
 hash_table.o: hash_table.h hash_table.cpp strlen.s
-	clang++ -msse4.2  -g -v -O0 -c hash_table.cpp
+	clang++  $(ASAN) -g -v -c hash_table.cpp
 
 hash_func.o: hash_func.cpp hash_table.h
-	clang++ -mcrc32 -g -O0 -c hash_func.cpp
+	clang++ -mcrc32 $(ASAN) -g -c hash_func.cpp
 
 list_func.o: list_func.cpp list_func.h
-	clang++ -g -O0 -c list_func.cpp
+	clang++ -g $(ASAN) -c list_func.cpp
 
 strlen.o: strlen.s 
 	nasm -f elf64 -g strlen.s 

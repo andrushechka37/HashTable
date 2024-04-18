@@ -24,4 +24,4 @@ size_t CRC32(char * word, int len_of_word); // TODO: naming?
 size_t CRC32_modified(char * word);
 
 
-int asm_strcmp(const char * word1, const char * word2);
+

@@ -162,7 +162,7 @@ int list_insert_after(doubly_linked_list * list, int position, char * value, int
 
     list->data[cur].prev = position; 
     
-    list->data[cur].value = (char *) calloc (max_len_of_word, 1);
+    list->data[cur].value = (char *) aligned_alloc (max_len_of_word, 32);
     strcpy(list->data[cur].value, value);
 
     list->data[cur].next = list->data[position].next;

@@ -6,7 +6,7 @@
 #include <cstdio>
 
 const int max_list_capacity = 5;
-const int max_len_of_word = 20;                      
+const int max_len_of_word = 32;                      
 // TODO:                       ^~~~~~~~~~~ I like spaces (look into git hook to catch this)
 
 const int free_elem_marker =  -1; 
