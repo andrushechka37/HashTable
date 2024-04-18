@@ -272,8 +272,15 @@ O0 after: 592 823 \
 03 after: 587 127
 
 TODO: Why is it so much slower, that's a BIG question, answer it, please!
-TODO: Run existing hash tables to see perfomance difference dense_hash_map by google, sparse_hash_map by google, std::unordered_map, std::map (although this is a map but not a hash map)
+
+TODO: Run existing hash tables to see performance difference dense_hash_map by google, sparse_hash_map by google, std::unordered_map, std::map (although this is a map but not a hash map)
+
 TODO: Improve your measuring metadology (use a separate thread for running your program that is not suseptible to random interruptions by task scheduler): https://stackoverflow.com/questions/13583146/whole-one-core-dedicated-to-single-process http://www.hydrogen18.com/blog/howto-give-a-single-process-its-own-cpu-core-in-linux.html https://askubuntu.com/questions/483824/how-to-run-a-program-with-only-one-cpu-core
-TODO: Graph of hash map perfomance depening on size (explain what happens)
+
+TODO: Graph of hash map performance depending on size (explain what happens)
+
 TODO: Don't store array of lists, it's too wasteful in terms of memory and allocation count and also cache-locality
+
 NOTE: You can read about open addressing, different probing methods and also Robin Good method
+
+TODO: lib for logging

@@ -13,30 +13,11 @@ extern "C" int asm_strlen(const char * str);
 
 // inline strange things 
 
-void hash_table_ctor(hash_table * table,  size_t (*hash_table_func)(char * word, int len_of_word)) {
+void hash_table_ctor(hash_table * table,  size_t (*hash_table_func)(char * word)) {
 
     (table->data) = (doubly_linked_list **) calloc(hash_table_size, sizeof(doubly_linked_list *));
     table->hash_table_func = hash_table_func;
     return;
-}
-
-const int vector_capacity = 16;
-
-int fast_strcmp (const char * first, int len1, const char * second, int len2) {
-
-    if (len1 != len2) {
-        return 1;
-    }
-
-    __m128i first_word =  _mm_loadu_si128((const __m128i_u *)first);
-    __m128i second_word = _mm_loadu_si128((const __m128i_u *)second);
-
-    if (len1 > vector_capacity) {
-        return strcmp(first, second);
-    }
-
-    return _mm_cmpestri(first_word, len1, second_word, len2, _SIDD_UBYTE_OPS);
-
 }
 
 int get_free_cell_in_list(doubly_linked_list * list, char * word, int len_of_word) {
@@ -55,7 +36,7 @@ int get_free_cell_in_list(doubly_linked_list * list, char * word, int len_of_wor
 
 void hash_table_insert(hash_table * table, char * word, int len_of_word) {
 
-    int place_for_number = table->hash_table_func(word, len_of_word);
+    int place_for_number = table->hash_table_func(word);
 
     if (CUR_LIST_PTR == NULL) {
         CUR_LIST_PTR = list_ctor();
@@ -97,9 +78,11 @@ void hash_table_dump_txt(hash_table * table) {
 
 
 void read_file_to_table(hash_table * table) {
-    FILE * data = fopen("data_storage.txt", "r"); // hard code of file name is very very ploho TODO: if you say it's bad it doesn't make it better (maybe a bit)!
-    if (data == NULL) {
-        printf("netu faila s dannumi\n"); // TODO: file not found: "useful-information-for-debuggin-this.txt", also why did fopen fail? Look in errno! (perror)
+    FILE * data = fopen("data_storage.txt", "r"); // hard code of file name is very very ploho 
+    if (data == NULL) {                                           // TODO: if you say it's bad it doesn't make it better (maybe a bit)!
+        printf("file not found: \"useful-information-for-debugging-this.txt\","
+                       "also why did fopen fail? Look in errno! (perror)\n");
+                       // place holder: maybe more informative message
         return;
     }
 
@@ -114,9 +97,7 @@ void read_file_to_table(hash_table * table) {
 
 int hash_table_search(char * word, hash_table * table) {
 
-    int len = strlen(word); // TODO: Isn't this slow?
-
-    size_t hash = table->hash_table_func(word, len);
+    size_t hash = table->hash_table_func(word);
 
     doubly_linked_list * list = table->data[hash];
 
@@ -142,7 +123,7 @@ void hash_table_dtor(hash_table * table) {
     table->data = NULL;
 }
 
-int TABLE_NUMBER = 1; // TODO: at least static?
+static int TABLE_NUMBER = 1; 
 void make_csv_table(hash_table * table) {
 
     char table_name[20] = "";
@@ -169,25 +150,10 @@ void make_csv_table(hash_table * table) {
     fclose(csv);
 }
 
-const int quantity_of_func = 7;
-
 int main(void) {
 
-    // TODO: typedef for hash function type
-    //       so it looks like hash_table_hash_function functions[] = {};
-    size_t (*hash_table_func_array[quantity_of_func])(char * word, int len_of_word) = {
-    always_zero_func, // TODO: style, align
-    first_letter_func,
-    word_len_func,
-    ascii_sum_func,
-    ascii_sum_div_len_func,
-    rol_hash_func,
-    CRC32_modified
-    };
-
-
     hash_table table = {};
-    hash_table_ctor(&table, hash_table_func_array[6]);
+    hash_table_ctor(&table, CRC32_modified);
 
     read_file_to_table(&table);
 

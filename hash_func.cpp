@@ -76,12 +76,12 @@ size_t CRC32(char * word, int len_of_word) {
     return ~crc % hash_table_size;
 }
 
-size_t CRC32_modified(char * word, int len_of_word) {
+size_t CRC32_modified(char * word) {
 
 	size_t hash = 0;
 	uint32_t crc = 0x407EF1CA;
 
-	for (size_t i = 0; i < len_of_word; i++) {
+	for (size_t i = 0; word[i] != '\0'; i++) {
 		hash = _mm_crc32_u8 (hash, word[i]);
 	}
 
@@ -109,12 +109,3 @@ int asm_strcmp(const char *word1, const char *word2) {
     } 
     return res;
 }
-
-
-
-
-
-
-
-
-// TODO: gotta love newlines
