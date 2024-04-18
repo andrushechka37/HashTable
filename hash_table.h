@@ -8,7 +8,6 @@ struct hash_table {
     size_t (*hash_table_func)(char * word); // TODO: rename func?
     doubly_linked_list ** data; // TODO: a pointer?
     size_t quantity_of_lists;
-    size_t sum_of_words; // TODO: what is this
 };
 
 

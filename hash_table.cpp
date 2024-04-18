@@ -46,7 +46,6 @@ void hash_table_insert(hash_table * table, char * word, int len_of_word) {
     int position = get_free_cell_in_list(CUR_LIST_PTR, word, len_of_word);
     if (position != -1) {
         list_insert_after(CUR_LIST_PTR, position, word, len_of_word);
-        table->sum_of_words++;
     }
 
     return;
@@ -133,10 +132,11 @@ void make_csv_table(hash_table * table) {
     char folder[30] = "tables/";
     strcat(folder, table_name);
 
+
     FILE * csv = fopen(folder, "w");
 
     if (csv == NULL) {
-        printf("NULL no tables folder\n");
+        printf("NULL no \"tables\" folder found in repository\n");
         return;
     }
 
@@ -182,27 +182,3 @@ int main(void) {
     hash_table_dtor(&table);
     printf("\n\n%llu\n\n",res/max_number);
 }
-
-
-
-
-
-
-
-
-
-
-
-        // printf("\nload factor of %d table is: %lf\n", i + 1, (float)table.sum_of_words/table.quantity_of_lists);
-
-        // double disp = 0;
-        // double average = (double)table.sum_of_words/hash_table_size;
-
-        // for (int i = 0; i < hash_table_size; i++) {
-        //     if (table.data[i] == NULL) {
-        //         disp += average * average;
-        //     } else {
-        //         disp += (table.data[i]->list_size - average) * (table.data[i]->list_size - average);
-        //     }
-        // }
-        // printf("\ndisp %d table is: %lf\n", i + 1, disp/table.quantity_of_lists);

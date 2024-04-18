@@ -95,10 +95,10 @@ int asm_strcmp(const char *word1, const char *word2) {
         "1:\n"
         "movdqu (%1), %%xmm0\n"       // xmm0 = str1
         "movdqu (%2), %%xmm1\n"       // xmm1 = str2
-        "pcmpeqb %%xmm1, %%xmm0\n"    // cmp(1, 2)
-        "pmovmskb %%xmm0, %0\n"       // result = cmp(1, 2)
+        "pcmpeqb %%xmm1, %%xmm0\n"    // cmp(1, 2) (store in dst 1 or 0 depending on cmp)
+        "pmovmskb %%xmm0, %0\n"       // create a mask and store in res
         "test %0, %0\n"              
-        "setnz %b0\n"                
+        "setnz %b0\n"                           
         : "=r" (res)
         : "r" (word1), "r" (word2)
         : "xmm0", "xmm1", "cc"

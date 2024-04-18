@@ -5,13 +5,6 @@
 #include <cstddef>
 #include <cstdio>
 
-// TODO: weird macro to have in your public header
-#define verify(list)               \
-if (verify_list(&list) != 0) {     \
-    return -1;                     \
-}
-
-
 const int max_list_capacity = 5;
 const int max_len_of_word = 20;                      
 // TODO:                       ^~~~~~~~~~~ I like spaces (look into git hook to catch this)
