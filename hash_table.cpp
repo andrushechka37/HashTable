@@ -11,7 +11,7 @@
 
 extern "C" int asm_strcmp_s(const char * str1, const char * str2);
 
-static inline int InlineAsmStrcmp (const char * str1, const char * str2)
+static inline int inline_asm_strcmp (const char * str1, const char * str2)
 {
     int res = 0;
 
@@ -172,7 +172,6 @@ int main(void) {
 
     unsigned long long res = 0;
     int max_number = 100000;
-    // int max_number = 1;
 
     // NOTE: you can add few initial runs to load caches
     for (int n = 0; n < max_number; n++) {
@@ -197,5 +196,4 @@ int main(void) {
     make_csv_table(&table);
     hash_table_dtor(&table);
     printf("\n\n%llu\n\n",res/max_number);
-    // printf("%d\n", InlineAsmStrcmp("dbhejdfdff", "dbhejdfhvkdff"));
 }

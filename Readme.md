@@ -311,7 +311,7 @@ asm_strcmp_s:
 
 # Оптимизация strcmp с помощью встроенного ассемблера
 ## Так как я был не удовлетворен оптимизацией strcmp я решил использовать встроенный ассемблер, чтобы иметь возможность заинлайнить свою функцию.
-```assembly
+```C
 static inline int inline_asm_strcmp(const char * str1, const char * str2) {
     int res = 0;
 
@@ -343,8 +343,12 @@ static inline int inline_asm_strcmp(const char * str1, const char * str2) {
 DED_coeff = $\frac{\text{ускорение программы}}{количество ассемблерных  строк + строк с intrinsicами} * 1000 = \frac{8360}{1 + 5*2} = 760$
 
 
+# Additional task from [alexpaniman](https://github.com/alexpaniman)
 
-NNNNNNNNNNNAAAAAAAAAAAAAAAAAMMMMMMMMMMMMMIIIIIIIIIIIIIINNNNNNNNNNNNNGGGGGGGGGGGGGG
+
+## Как зависит производительность от размера таблицы?
+
+
 
 TODO: Run existing hash tables to see performance difference dense_hash_map by google, sparse_hash_map by google, std::unordered_map, std::map (although this is a map but not a hash map)
 

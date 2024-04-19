@@ -11,11 +11,14 @@ void removePunctuation(char * word) {
     //    ^ TODO: haven't decided yet char* a or char *a and choose the worst
     
     while(*old_version) {
+
         if (!isalpha((unsigned char) * old_version)) {
             old_version++;
+
         } else if (old_version == new_verion) {
             old_version++;
             new_verion++;
+            
         } else {
             *new_verion++ = *old_version++;
         }
@@ -30,6 +33,7 @@ void parse_text(FILE * original, FILE * parsed_text) {
     int len = 0;
 
     while (fscanf(original, "%s %n", word, &len) == 1) {
+
         removePunctuation(word);
         if (strlen(word) == 0) continue;
         fprintf(parsed_text, "%ld %s\n", strlen(word), word);
