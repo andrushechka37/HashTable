@@ -2,6 +2,7 @@
 #include <cstddef>
 #include <cstdint>
 #include "hash_table.h"
+#include <cstring>
 #include <immintrin.h>
 #include <stddef.h>
 
@@ -58,7 +59,8 @@ size_t rol_hash_func(char * word, int len_of_word) {
     return hash % hash_table_size;
 }
 
-size_t CRC32(char * word, int len_of_word) {
+size_t CRC32(char * word) {
+    int len_of_word = strlen(word);
     uint32_t crc = 0xffffffff;
 
     unsigned char* str = (unsigned char*)word;

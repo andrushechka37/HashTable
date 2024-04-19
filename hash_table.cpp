@@ -11,18 +11,20 @@
 
 extern "C" int asm_strcmp_s(const char * str1, const char * str2);
 
-// static inline int InlineAsmStrcmp (const char * str1, const char * str2) {
-//     int res = 0;
+static inline int InlineAsmStrcmp (const char * str1, const char * str2)
+{
+    int res = 0;
 
-//     asm (".intel_syntax noprefix\n"
-//          "vmovdqa ymm1, YMMWORD PTR [%1]\n"
-//          "vpcmpeqb ymm0, ymm1, YMMWORD PTR [%2]\n"
-//          "vpmovmskb %0, ymm0\n"
-//          ".att_syntax prefix\n"
-//          : "=r" (res) : "r" (str1), "r" (str2) : "ymm0", "ymm1", "cc");
+    asm (".intel_syntax noprefix\n"
+         "vmovdqu ymm1, YMMWORD PTR [rdi] \n"
+         "vpcmpeqd ymm0, ymm1, YMMWORD PTR [rsi]\n"
+         "vmovmskps eax, ymm0\n"
+         "xor eax, 0xFF\n"
+         ".att_syntax prefix\n"
+         : "=r" (res) :: "ymm0", "ymm1", "cc");
 
-//     return res;
-// }
+    return res;
+}
 
 void hash_table_ctor(hash_table * table,  size_t (*hash_table_func)(char * word)) {
 
@@ -113,7 +115,7 @@ int hash_table_search(char * word, hash_table * table) {
 
     for (int i = 1; i <= list->list_size; i++) {
         
-        if (strcmp(word, list->data[i].value) == 0) {
+        if (InlineAsmStrcmp(word, list->data[i].value) == 0) {
             return i;
         }
     }
@@ -190,7 +192,10 @@ int main(void) {
         res += (end-start);
     }
 
+    
+
     make_csv_table(&table);
     hash_table_dtor(&table);
     printf("\n\n%llu\n\n",res/max_number);
+    // printf("%d\n", InlineAsmStrcmp("dbhejdfdff", "dbhejdfhvkdff"));
 }

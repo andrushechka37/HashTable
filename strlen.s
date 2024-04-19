@@ -3,6 +3,7 @@ global asm_strcmp_s
 
 asm_strcmp_s:
         vmovdqa ymm1, yword [rdi]  
-        vpcmpeqb ymm0, ymm1, yword [rsi]    
-        vpmovmskb rax, ymm0  
+        vpcmpeqd ymm0, ymm1, yword [rsi]    
+        vmovmskps eax, ymm0
+        xor eax, 0xFF
         ret

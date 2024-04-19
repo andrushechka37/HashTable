@@ -4,7 +4,7 @@
 <br/>
 
 
-# ![1](/images/2.png) 
+# ![1](/images/2.png)
 
 ##  Отчёт о выполнении лабораторной работы 3.7.8
 #  Оптимизация Хеш-таблицы, основанной на двусвязном списке на массивах, с разрешенной коллизией при помощи знаний ассемблера и Intrinsic функций
@@ -35,17 +35,17 @@
 <br/>
 <br/>
 
-# `1 Введение`: 
-# *Цель работы*: 
+# `1 Введение`:
+# *Цель работы*:
 * Написать Хеш-таблицу на С
 * Сравнить дисперсию для различных хеш-функций
 * Найти узкие места программы с помощью профилировщика
 * Ускорить узкие места при помощи Intrinsic функций и ассемблерных оптимизаций
-  
+
 # `2 Ход работы`:
 ## `Нулевая часть работы`: написание хеш таблицы на С, которая хранит английские слова
 
-## За основу таблицы был взят двусвязный список на массивах из репозитория [List](https://github.com/andrushechka37/List). 
+## За основу таблицы был взят двусвязный список на массивах из репозитория [List](https://github.com/andrushechka37/List).
 ## Были реализованы функции:
 * Вставки в таблицу
 * Поиска данных в таблице
@@ -180,7 +180,7 @@ my_rol(unsigned long):
 
 ```
 
-        
+
 ## CRC32
 ![df](images/ctc.png)
 
@@ -199,10 +199,40 @@ my_rol(unsigned long):
 |            CRC32           | 0.001               |
 
 
--------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # `Вторая часть работы`: Оптимизация узких мест программы
 ## С помощью профилировщика perf были выявлены функции, с самым большим временем исполнения.
 ![2](/images/perf1.png)
+
+## Видно, что основной вклад в нагрузку вносит хеш-функция и strcmp, следовательно это первые кандитаты на оптимизацию.
+
+
+## Суммарное время поиска всех слов, находящихся в таблице, считалось при помощи __rdtsc, повторялось 100,000 раз, и считалось среднее. Для увеличения достоверности данных программа запускалась на отдельном ядре с высшим приоритетом(прерывания я не убирал, страшно было чето там напортачить, по наблюдениям разброс невелик). `nice -n -19 taskset 1`
+
+
+
+| Version | Compilation flags | Ticks * $10^3$ | Acceleration relative to baseline |  Acceleration relative to previous optimization |
+|:-------:|:-----------------:|:--------------:|:---------------------------------:|:-----------------------------------------------:|
+|   base  |        -O0        |      1185      |                 1                 |                        1                        |
+|   base  |        -O3        |       159      |                 1                 |                        1                        |
+
 
 # Оптимизация CRC32
 ## Функция CRC32 была ускорена путем использования intrinsic функций, а именно `_mm_crc32_u8`
@@ -213,65 +243,108 @@ size_t CRC32_modified(char * word, int len_of_word) {
 	uint32_t crc = 0x407EF1CA;
 
 	for (size_t i = 0; i < len_of_word; i++) {
-		hash = _mm_crc32_u8 (hash, word[i]);
+		hash = _mm_crc32_u8(hash, word[i]);
 	}
 
 	return hash % hash_table_size;
 }
 ```
 
-O0 before: 1231 868 \
-O3 before: 1232 153 \
-O0 after: 83 680 \
-03 after: 80 608 
 
-# Оптимизация strcmp при помощи встроенного ассемблера:
+|    Version    | Compilation flags | Ticks * $10^3$ | Acceleration relative to baseline |  Acceleration relative to previous optimization |
+|:-------------:|:-----------------:|:--------------:|:---------------------------------:|:-----------------------------------------------:|
+| intrinsic opt |        -O0        |       125      |                9,41               |                       9,41                      |
+| intrinsic opt |        -O3        |       22       |                7,10               |                       7,10                      |
 
-```C
-int asm_strcmp(const char *word1, const char *word2) {
+## Результат впечатляющий, ускорение для обоих версий значительное, значит intrinsic оптимизация и переход на платформно-зависимый код оправдан.
+
+# Оптимизация strcmp при помощи ассемблерной функции:
+
+## Первоначально код выглядел так:
+```assembly
+section .text
+global asm_strcmp_s
+
+asm_strcmp_s:
+        vmovdqu ymm1, yword [rdi]
+        vpcmpeqb ymm0, ymm1, yword [rsi]
+        vpmovmskb rax, ymm0
+        ret
+```
+## Однако он был медленнее, чем стандартный strcmp ~ 2 раза, что было крайне странно.
+## Спустя многие часы разбирательств я обратил на странное поведение функции:
+![](/images/emul.png)
+## Основная нагрузка приходилась на cmp, что было крайне странно. Оказалось, что данная инструкция поддерживается начиная с avx2, но на сервере был только avx. Видимо процессор эмулировал поведение инструкции, из-за чего скорость выполнения значительно проседала.
+
+## После изменения код выглядел так:
+```assembly
+section .text
+global asm_strcmp_s
+
+asm_strcmp_s:
+        vmovdqu ymm1, yword [rdi]
+        vpcmpeqd ymm0, ymm1, yword [rsi]
+        vmovmskps eax, ymm0
+        xor eax, 0xFF
+        ret
+```
+
+
+| Version | Compilation flags | Ticks * $10^3$ | Acceleration relative to baseline |  Acceleration relative to previous optimization |
+|:-------:|:-----------------:|:--------------:|:---------------------------------:|:-----------------------------------------------:|
+| asm opt |        -O0        |       114      |               10,37               |                       1,1                       |
+| asm opt |        -O3        |       28       |                5,55               |                       0,78                      |
+
+
+## Результат -O0 предсказуем, но результат для -O3 непонятен. Почему так произошло?
+
+## Рассмотрим первую оптимизацию
+![](/images/int%201.png)
+![](/images/int%202.png)
+
+## Видим, что компилятор заинлайнил и функцию поиска, и strcmp
+
+![](/images/asm%201.png)
+![](/images/asm%202.png)
+
+## Во втором случае компиллятор не заинлайнил мой strcmp, в результате чего производительность могла ухудшится.
+
+# Оптимизация strcmp с помощью встроенного ассемблера
+## Так как я был не удовлетворен оптимизацией strcmp я решил использовать встроенный ассемблер, чтобы иметь возможность заинлайнить свою функцию.
+```assembly
+static inline int inline_asm_strcmp(const char * str1, const char * str2) {
     int res = 0;
 
-    asm volatile (
-        "1:\n"
-        "movdqu (%1), %%xmm0\n"       // xmm0 = str1
-        "movdqu (%2), %%xmm1\n"       // xmm1 = str2
-        "pcmpeqb %%xmm1, %%xmm0\n"    // cmp(1, 2)
-        "pmovmskb %%xmm0, %0\n"       // res = cmp(1, 2)
-        "test %0, %0\n"               
-        "setnz %b0\n"                 
-        : "=r" (res)
-        : "r" (word1), "r" (word2)
-        : "xmm0", "xmm1", "cc"
-    );
+    asm (".intel_syntax noprefix\n"
+         "vmovdqu ymm1, YMMWORD PTR [rdi] \n"
+         "vpcmpeqd ymm0, ymm1, YMMWORD PTR [rsi]\n"
+         "vmovmskps eax, ymm0\n"
+         "xor eax, 0xFF\n"
+         ".att_syntax prefix\n"
+         : "=r" (res) :: "ymm0", "ymm1", "cc");
 
-    if (res == 1) {
-        return 0;
-    } 
     return res;
 }
 ```
 
-O0 after: 168 428 \
-03 after: 167 569
 
-# Оптимизация strlen путем написания ассемблерной функции:
 
-```assembly
-asm_strlen:
-    xor     rax, rax          
-    vxorps  ymm2, ymm2, ymm2 
+| Version | Compilation flags | Ticks * $10^3$ | Acceleration relative to baseline |  Acceleration relative to previous optimization |
+|:-------:|:-----------------:|:--------------:|:---------------------------------:|:-----------------------------------------------:|
+| asm opt |        -O0        |       105      |               11,25               |                       1,08                      |
+| asm opt |        -O3        |       19       |                8,36               |                       1,5                       |
 
-    vmovdqu ymm0, [rdi]       
-    vpcmpeqb ymm1, ymm2, ymm0 
-    vpmovmskb eax, ymm1      
-    bsf     rax, rax          
-    ret                     
-```
+## Результат в принципе ожидаем, asm_strcmp ускорилась относительно библиотечного при -O3 в 1,17 раза, что является приемлемым результатом.
 
-O0 after: 592 823 \
-03 after: 587 127
 
-TODO: Why is it so much slower, that's a BIG question, answer it, please!
+# `Обсуждение результатов`
+## Ну нам удалось неплохо оптимизировать, DED_coeff >> 1, что очень хорошо
+
+DED_coeff = $\frac{\text{ускорение программы}}{количество ассемблерных  строк + строк с intrinsicами} * 1000 = \frac{8360}{1 + 5*2} = 760$
+
+
+
+NNNNNNNNNNNAAAAAAAAAAAAAAAAAMMMMMMMMMMMMMIIIIIIIIIIIIIINNNNNNNNNNNNNGGGGGGGGGGGGGG
 
 TODO: Run existing hash tables to see performance difference dense_hash_map by google, sparse_hash_map by google, std::unordered_map, std::map (although this is a map but not a hash map)
 
@@ -284,3 +357,35 @@ TODO: Don't store array of lists, it's too wasteful in terms of memory and alloc
 NOTE: You can read about open addressing, different probing methods and also Robin Good method
 
 TODO: lib for logging
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+baseline O0  --  1185525
+
+baseline O3  --  159119 
+
+1opt O0  --  125921
+
+1opt O3  --  22401
+
+
+2opt O0  --  114249    (дала незначительный прирост нормас)
+
+2opt O3  --  28633     (потому что при первой оптимизации inline search и inline cmp, 2 фотки) (a во втором случае не инлайнит 2 фотки)
+
+
+
+105303    O0 ускорило но не сильно 
+
+19014    O3   почти также

@@ -17,10 +17,10 @@ ASAN = -O3 -mavx
 .PHONY: start
 
 start: hash_table.o hash_func.o list_func.o strlen.o
-	clang++ hash_table.o hash_func.o list_func.o strlen.o $(ASAN) -o list_test && ./list_test
+	clang++ hash_table.o hash_func.o list_func.o strlen.o $(ASAN) -o list_test
 
 hash_table.o: hash_table.h hash_table.cpp strlen.s
-	clang++  $(ASAN) -g -v -c hash_table.cpp
+	clang++  $(ASAN) -g -c hash_table.cpp
 
 hash_func.o: hash_func.cpp hash_table.h
 	clang++ -mcrc32 $(ASAN) -g -c hash_func.cpp
