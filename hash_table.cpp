@@ -11,8 +11,7 @@
 
 extern "C" int asm_strcmp_s(const char * str1, const char * str2);
 
-static inline int inline_asm_strcmp (const char * str1, const char * str2)
-{
+static inline int inline_asm_strcmp(const char * str1, const char * str2) {
     int res = 0;
 
     asm (".intel_syntax noprefix\n"
@@ -115,7 +114,7 @@ int hash_table_search(char * word, hash_table * table) {
 
     for (int i = 1; i <= list->list_size; i++) {
         
-        if (asm_strcmp_s(word, list->data[i].value) == 0) {
+        if (inline_asm_strcmp(word, list->data[i].value) == 0) {
             return i;
         }
     }
@@ -165,13 +164,17 @@ void make_csv_table(hash_table * table) {
 
 int main(void) {
 
+    for (size_t k = 81000; k < 1000000; k += 5000) {
+
+    hash_table_size = k;
+
     hash_table table = {};
     hash_table_ctor(&table, CRC32_modified);
 
     read_file_to_table(&table);
 
     unsigned long long res = 0;
-    int max_number = 100000;
+    int max_number = 10000;
 
     // NOTE: you can add few initial runs to load caches
     for (int n = 0; n < max_number; n++) {
@@ -191,9 +194,17 @@ int main(void) {
         res += (end-start);
     }
 
+    FILE * table_perf = fopen("table_size.csv", "a");
+
+    fprintf(table_perf, "%lu;%llu\n", k, res/max_number);
+
+    fclose(table_perf);
+
     
 
-    make_csv_table(&table);
+    // make_csv_table(&table);
     hash_table_dtor(&table);
-    printf("\n\n%llu\n\n",res/max_number);
+    // printf("\n\n%llu\n\n",res/max_number);
+
+    }
 }

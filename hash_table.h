@@ -2,7 +2,7 @@
 #include "list_func.h"
 #include <cstddef>
 
-const int hash_table_size = 2003; // NOTE: 2003 was a good year (choose numbers more carefully)
+inline int hash_table_size = 2003; // NOTE: 2003 was a good year (choose numbers more carefully)
 
 struct hash_table {
     size_t (*hash_table_func)(char * word); // TODO: rename func?
