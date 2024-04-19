@@ -115,7 +115,7 @@ int hash_table_search(char * word, hash_table * table) {
 
     for (int i = 1; i <= list->list_size; i++) {
         
-        if (InlineAsmStrcmp(word, list->data[i].value) == 0) {
+        if (asm_strcmp_s(word, list->data[i].value) == 0) {
             return i;
         }
     }

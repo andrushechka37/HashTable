@@ -16,10 +16,10 @@ ASAN = -O3 -mavx
 
 .PHONY: start
 
-start: hash_table.o hash_func.o list_func.o strlen.o
-	clang++ hash_table.o hash_func.o list_func.o strlen.o $(ASAN) -o list_test
+start: hash_table.o hash_func.o list_func.o strcmp.o
+	clang++ hash_table.o hash_func.o list_func.o strcmp.o $(ASAN) -o list_test
 
-hash_table.o: hash_table.h hash_table.cpp strlen.s
+hash_table.o: hash_table.h hash_table.cpp strcmp.s
 	clang++  $(ASAN) -g -c hash_table.cpp
 
 hash_func.o: hash_func.cpp hash_table.h
@@ -28,8 +28,8 @@ hash_func.o: hash_func.cpp hash_table.h
 list_func.o: list_func.cpp list_func.h
 	clang++ -g $(ASAN) -c list_func.cpp
 
-strlen.o: strlen.s 
-	nasm -f elf64 -g strlen.s 
+strcmp.o: strcmp.s 
+	nasm -f elf64 -g strcmp.s 
 
 clean:
 	rm -rf *.o list_test get_data_storage tables/*.csv perf.data
