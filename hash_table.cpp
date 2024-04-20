@@ -9,7 +9,7 @@
 #include <nmmintrin.h>
 
 
-extern "C" int asm_strcmp_s(const char * str1, const char * str2);
+extern "C" int asm_strcmp_s(const char * str1, const char * str2); // TODO: rename
 
 static inline int inline_asm_strcmp(const char * str1, const char * str2) {
     int res = 0;
@@ -89,10 +89,10 @@ void hash_table_dump_txt(hash_table * table) {
 
 
 void read_file_to_table(hash_table * table) {
-    FILE * data = fopen("data_storage.txt", "r"); // hard code of file name is very very ploho 
-    if (data == NULL) {                                           // TODO: if you say it's bad it doesn't make it better (maybe a bit)!
-        printf("file not found: \"useful-information-for-debugging-this.txt\","
-                       "also why did fopen fail? Look in errno! (perror)\n");
+    FILE * data = fopen("data_storage.txt", "r"); // TODO: hard code of file name is very very ploho 
+    if (data == NULL) {                           // TODO: if you say it's bad it doesn't make it better (maybe a bit)!
+        printf("file not found: \"useful-information-for-debugging-this.txt\"," // TODO: you are pure evil
+                       "also why did fopen fail? Look in errno! (perror)\n");   //       I'm horrified...
                        // place holder: maybe more informative message
         return;
     }
@@ -114,7 +114,7 @@ int hash_table_search(char * word, hash_table * table) {
 
     for (int i = 1; i <= list->list_size; i++) {
         
-        if (inline_asm_strcmp(word, list->data[i].value) == 0) {
+        if (inline_asm_strcmp(word, list->data[i].value) == 0) { // NOTE: you can substitute it with define 
             return i;
         }
     }
@@ -134,21 +134,21 @@ void hash_table_dtor(hash_table * table) {
     table->data = NULL;
 }
 
-static int TABLE_NUMBER = 1; 
+static int TABLE_NUMBER = 1; // TODO: place it inside a function
 void make_csv_table(hash_table * table) {
 
     char table_name[20] = "";
     snprintf(table_name, 9,  "%d", TABLE_NUMBER);
     TABLE_NUMBER++;
-    strcat(table_name, "table.csv");
-    char folder[30] = "tables/";
+    strcat(table_name, "table.csv"); // TODO: hard
+    char folder[30] = "tables/"; // TODO: coded
     strcat(folder, table_name);
 
 
     FILE * csv = fopen(folder, "w");
 
     if (csv == NULL) {
-        printf("NULL no \"tables\" folder found in repository\n");
+        printf("NULL no \"tables\" folder found in repository\n"); // TODO: and copied here
         return;
     }
 
@@ -196,7 +196,7 @@ int main(void) {
 
     FILE * table_perf = fopen("table_size.csv", "a");
 
-    fprintf(table_perf, "%lu;%llu\n", k, res/max_number);
+    fprintf(table_perf, "%lu;%llu\n", k, res/max_number); // TODO: res/max_number my ass, add a space
 
     fclose(table_perf);
 
