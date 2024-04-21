@@ -2,6 +2,7 @@
 #include "list_func.h"
 #include <cstddef>
 
+// TODO: It would be much better if you didn't make it mutable and I thought fixed size was a bad idea...
 inline int hash_table_size = 2003; // NOTE: 2003 was a good year (choose numbers more carefully)
 
 struct hash_table {
