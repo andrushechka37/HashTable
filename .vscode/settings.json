@@ -88,6 +88,8 @@
     "cmpestrc",
     "ploho",
     "setr",
+    "taskset",
     "вышепредставленных"
-  ]
+  ],
+  "editor.inlayHints.enabled": "on"
 }

@@ -164,7 +164,7 @@ void make_csv_table(hash_table * table) {
 
 int main(void) {
 
-    for (size_t k = 81000; k < 1000000; k += 5000) {
+    for (size_t k = 1; k < 215251; k += 50) {
 
     hash_table_size = k;
 
@@ -199,8 +199,6 @@ int main(void) {
     fprintf(table_perf, "%lu;%llu\n", k, res/max_number); // TODO: res/max_number my ass, add a space
 
     fclose(table_perf);
-
-    
 
     // make_csv_table(&table);
     hash_table_dtor(&table);

@@ -5,7 +5,7 @@
       "type": "lldb",
       "request": "launch",
       "name": "andrews bebug",
-      "program": "${workspaceFolder}/list_test",
+      "program": "${workspaceFolder}/list_test_haha",
       "args": [],
       "cwd": "${workspaceFolder}"
     },
@@ -37,8 +37,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": false,
-      "cwd": "/root/AsmPrintf",
-      "program": "/root/AsmPrintf/build/Debug/outDebug",
+      "cwd": "/root/HASH/HashTable",
+      "program": "/root/HASH/HashTable/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
